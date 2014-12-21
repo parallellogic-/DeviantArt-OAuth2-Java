@@ -84,6 +84,9 @@ public final class OAuth2 {
 		ret = ret.replace(" ", "%20");
 		return ret;
 	}
+	public final RespToken getToken() {
+		return mToken;
+	}
 	public final Scope[] getScopes() {
 		if (mToken == null || mToken.getScopes() == null) {
 			return new Scope[0];
@@ -117,8 +120,9 @@ public final class OAuth2 {
 	}
 	
 	public final Response requestAuthRevoke() {
-		if (!hasAccessToken()) {
-			return RespError.NO_AUTH;
+		Response respVerify = verifyScopesAndAuth();
+		if (respVerify.isError()) {
+			return respVerify;
 		}
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("access_token", mToken.getToken());
@@ -205,11 +209,9 @@ public final class OAuth2 {
 	}
 	
 	public final Response requestStashSpace() {
-		if (!hasAccessToken()) {
-			return RespError.NO_AUTH;
-		}
-		if (!hasScopes(Scope.STASH)) {
-			return RespError.INSUFFICIANT_SCOPE;
+		Response respVerify = verifyScopesAndAuth(Scope.STASH);
+		if (respVerify.isError()) {
+			return respVerify;
 		}
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("access_token", mToken.getToken());
@@ -229,11 +231,9 @@ public final class OAuth2 {
 	}
 	
 	public final Response requestUserDamntoken() {
-		if (!hasAccessToken()) {
-			return RespError.NO_AUTH;
-		}
-		if (!hasScopes(Scope.USER)) {
-			return RespError.INSUFFICIANT_SCOPE;
+		Response respVerify = verifyScopesAndAuth(Scope.USER);
+		if (respVerify.isError()) {
+			return respVerify;
 		}
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("access_token", mToken.getToken());
@@ -252,11 +252,9 @@ public final class OAuth2 {
 		}
 	}
 	public final Response requestUserWhoami() {
-		if (!hasAccessToken()) {
-			return RespError.NO_AUTH;
-		}
-		if (!hasScopes(Scope.USER)) {
-			return RespError.INSUFFICIANT_SCOPE;
+		Response respVerify = verifyScopesAndAuth(Scope.USER);
+		if (respVerify.isError()) {
+			return respVerify;
 		}
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("access_token", mToken.getToken());
@@ -282,11 +280,9 @@ public final class OAuth2 {
 		}
 	}
 	public final Response requestUserWhois(String... users) {
-		if (!hasAccessToken()) {
-			return RespError.NO_AUTH;
-		}
-		if (!hasScopes(Scope.BROWSE)) {
-			return RespError.INSUFFICIANT_SCOPE;
+		Response respVerify = verifyScopesAndAuth(Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
 		}
 		if (users.length == 0) {
 			return RespError.INVALID_REQUEST;
@@ -318,8 +314,9 @@ public final class OAuth2 {
 	}
 	
 	public final Response requestUtilPlacebo() {
-		if (!hasAccessToken()) {
-			return RespError.NO_AUTH;
+		Response respVerify = verifyScopesAndAuth();
+		if (respVerify.isError()) {
+			return respVerify;
 		}
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("access_token", mToken.getToken());
@@ -437,6 +434,18 @@ public final class OAuth2 {
 				er.printStackTrace();
 				return null;
 			}
+		}
+	}
+
+	public final Response verifyScopesAndAuth(Scope... scopes) {
+		if (!hasAccessToken()) {
+			return RespError.NO_AUTH;
+		}
+		else if (!hasScopes(scopes)) {
+			return RespError.INSUFFICIANT_SCOPE;
+		}
+		else {
+			return new Response();
 		}
 	}
 }

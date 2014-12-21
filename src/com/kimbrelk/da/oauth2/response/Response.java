@@ -1,20 +1,19 @@
 package com.kimbrelk.da.oauth2.response;
 
 public class Response {
-	protected String mStatus;
+	protected boolean mIsSuccess;
 	
 	public Response() {
-		mStatus = "success";
+		mIsSuccess = true;
 	}
-	public Response(String status) {
-		mStatus = status;
+	public Response(boolean isSuccess) {
+		mIsSuccess = isSuccess;
 	}
-	
-	public final String getStatus() {
-		return mStatus;
-	}
-	
+
 	public final boolean isError() {
-		return mStatus.equalsIgnoreCase("error");
+		return !mIsSuccess;
+	}
+	public final boolean isSuccess() {
+		return mIsSuccess;
 	}
 }

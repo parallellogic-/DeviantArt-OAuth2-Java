@@ -9,6 +9,7 @@ import org.json.JSONObject;
 
 public final class RespError extends Response {
 	public final static RespError INSUFFICIANT_SCOPE = new RespError("insufficiant_scope", "The requested resource requires a higher scope than the user has allowed the client to access, client needs to re-authorize.");
+	public final static RespError INVALID_GRANT = new RespError("invalid_grant", "Unsupported grantType.");
 	public final static RespError INVALID_REQUEST = new RespError("invalid_request", "Request field validation failed.");
 	public final static RespError NO_AUTH = new RespError("no_auth", "The client does not have an access_token.");
 	public final static RespError REQUEST_FAILED = new RespError("request_failed", "The client failed to make the request.");
@@ -19,14 +20,14 @@ public final class RespError extends Response {
 	protected Map<String, String> mErrorDetails;
 
 	public RespError(String type, String description) {
-		super("error");
+		super(false);
 		mType = type;
 		mDesc = description;
 		mErrorCode = -1;
 		mErrorDetails = new HashMap<String, String>();
 	}
 	public RespError(JSONObject json) throws JSONException {
-		super("error");
+		super(false);
 		mType = json.getString("error");
 		mDesc = json.getString("error_description");
 		mErrorCode = -1;
