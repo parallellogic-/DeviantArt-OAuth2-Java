@@ -1,7 +1,7 @@
 package com.kimbrelk.da.oauth2.response;
 
-import org.json.pc.JSONException;
-import org.json.pc.JSONObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public final class RespStashSpace extends Response {
 	private long mSpaceAvailable;

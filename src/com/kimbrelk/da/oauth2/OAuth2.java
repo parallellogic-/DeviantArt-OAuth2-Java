@@ -24,9 +24,9 @@ import java.util.Iterator;
 import java.util.Map;
 import javax.net.ssl.HttpsURLConnection;
 
-import org.json.pc.JSONArray;
-import org.json.pc.JSONException;
-import org.json.pc.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public final class OAuth2 {
 	private final static Version VERSION = new Version(1, 20141204);
@@ -367,7 +367,6 @@ public final class OAuth2 {
 				connection.setDoOutput(true);
 				connection.setDoInput(true);
 				//connection.setRequestProperty("Authorization", "Basic " + base64(CLIENT_ID + ":" + loadLast()));
-				//connection.setRequestProperty("Content-Type", "application/application/json");
 				connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 				connection.setRequestProperty("Content-Length", "" + postData.length());
 				connection.connect();

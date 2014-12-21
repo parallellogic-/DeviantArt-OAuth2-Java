@@ -1,7 +1,7 @@
 package com.kimbrelk.da.oauth2.response;
 
-import org.json.pc.JSONException;
-import org.json.pc.JSONObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class RespUserDamntoken extends Response {
 	private String mDamnToken;

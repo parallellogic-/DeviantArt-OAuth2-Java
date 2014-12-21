@@ -3,8 +3,9 @@ package com.kimbrelk.da.oauth2.response;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import org.json.pc.JSONException;
-import org.json.pc.JSONObject;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public final class RespError extends Response {
 	public final static RespError INSUFFICIANT_SCOPE = new RespError("insufficiant_scope", "The requested resource requires a higher scope than the user has allowed the client to access, client needs to re-authorize.");

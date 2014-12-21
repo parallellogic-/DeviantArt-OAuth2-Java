@@ -1,8 +1,9 @@
 package com.kimbrelk.da.oauth2.struct;
 
 import java.util.Date;
-import org.json.pc.JSONException;
-import org.json.pc.JSONObject;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.kimbrelk.da.util.Util;
 
