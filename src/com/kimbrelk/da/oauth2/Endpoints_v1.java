@@ -1,6 +1,6 @@
 package com.kimbrelk.da.oauth2;
 
-public final class Endpoint_v1 extends Endpoint {
+public final class Endpoints_v1 extends Endpoints {
 	public final static int VER_MAJOR = 1;
 	private final static String PREFIX_ENDPOINT = 			"https://www.deviantart.com/api/v" + VER_MAJOR + "/oauth2/";
 

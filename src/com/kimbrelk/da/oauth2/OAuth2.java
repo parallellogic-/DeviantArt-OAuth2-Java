@@ -27,7 +27,7 @@ import org.json.JSONObject;
 
 public final class OAuth2 {
 	private final static Version VERSION = new Version(1, 20141204);
-	private final static Endpoint_v1 ENDPOINT = new Endpoint_v1();
+	private final static Endpoints_v1 ENDPOINTS = new Endpoints_v1();
 	
 	private RespToken mToken;
 	private ClientCredentials mClientCredentials;
@@ -69,7 +69,7 @@ public final class OAuth2 {
 	}
 	
 	public final String getAuthorizeURL(String redirectURI, Scope... scopes) {
-		String ret = ENDPOINT.OAUTH2_AUTHORIZE + "?";
+		String ret = ENDPOINTS.OAUTH2_AUTHORIZE + "?";
 		if (scopes.length > 0) {
 			ret += "scope=";
 			for(int a=0; a<scopes.length; a++) {
@@ -122,7 +122,7 @@ public final class OAuth2 {
 		}
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("access_token", mToken.getToken());
-		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINT.OAUTH2_REVOKE, params));
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.OAUTH2_REVOKE, params));
 		try {
 			System.out.println(json.toString(5));
 			if (json.getString("status").equalsIgnoreCase("success")) {
@@ -169,7 +169,7 @@ public final class OAuth2 {
 			}
 		}
 		
-		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINT.OAUTH2_TOKEN, params));
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.OAUTH2_TOKEN, params));
 		Response response = null;
 		try {
 			if (json.getString("status").equalsIgnoreCase("error")) {
@@ -204,19 +204,19 @@ public final class OAuth2 {
 		return response;
 	}
 	
-	public final Response requestUserDamntoken() {
+	public final Response requestStashSpace() {
 		if (!hasAccessToken()) {
 			return RespError.NO_AUTH;
 		}
-		if (!hasScopes(Scope.USER)) {
+		if (!hasScopes(Scope.STASH)) {
 			return RespError.INSUFFICIANT_SCOPE;
 		}
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("access_token", mToken.getToken());
-		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINT.USER_DAMNTOKEN, params));
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.STASH_SPACE, params));
 		try {
 			if (!json.has("error")) {
-				return new RespUserDamntoken(json);
+				return new RespStashSpace(json);
 			}
 			else {
 				return new RespError(json);
@@ -228,19 +228,19 @@ public final class OAuth2 {
 		}
 	}
 	
-	public final Response requestStashSpace() {
+	public final Response requestUserDamntoken() {
 		if (!hasAccessToken()) {
 			return RespError.NO_AUTH;
 		}
-		if (!hasScopes(Scope.STASH)) {
+		if (!hasScopes(Scope.USER)) {
 			return RespError.INSUFFICIANT_SCOPE;
 		}
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("access_token", mToken.getToken());
-		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINT.STASH_SPACE, params));
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.USER_DAMNTOKEN, params));
 		try {
 			if (!json.has("error")) {
-				return new RespStashSpace(json);
+				return new RespUserDamntoken(json);
 			}
 			else {
 				return new RespError(json);
@@ -260,7 +260,7 @@ public final class OAuth2 {
 		}
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("access_token", mToken.getToken());
-		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINT.USER_WHOAMI, params));
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.USER_WHOAMI, params));
 		try {
 			if (!json.has("error")) {
 				return new RespUserWhoami(
@@ -297,7 +297,7 @@ public final class OAuth2 {
 		for(int a=0; a<users.length; a++) {
 			postData += "usernames[" + a + "]=" + users[a] + "\n";
 		}
-		JSONObject json = requestJSON(Verb.POST, createURL(ENDPOINT.USER_WHOIS, params), postData);
+		JSONObject json = requestJSON(Verb.POST, createURL(ENDPOINTS.USER_WHOIS, params), postData);
 		try {
 			if (!json.has("error")) {
 				JSONArray jsonResults = json.getJSONArray("results");
@@ -323,7 +323,7 @@ public final class OAuth2 {
 		}
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("access_token", mToken.getToken());
-		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINT.UTIL_PLACEBO, params));
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.UTIL_PLACEBO, params));
 		try {
 			if (json.getString("status").equalsIgnoreCase("success")) {
 				return new Response();
