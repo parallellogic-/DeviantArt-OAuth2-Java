@@ -1,7 +1,6 @@
 package com.kimbrelk.da.oauth2.response;
 
 import com.kimbrelk.da.oauth2.Scope;
-import com.kimbrelk.da.oauth2.Token;
 
 public final class RespToken extends Response {
 	/**
@@ -9,10 +8,10 @@ public final class RespToken extends Response {
 	 */
 	private long mExpiresAt;
 	private Scope[] mScopes;
-	private Token mToken;
-	private Token mTokenRefresh;
+	private String mToken;
+	private String mTokenRefresh;
 	
-	public RespToken(int expiresIn, Token token, Token refreshToken, Scope... scopes) {
+	public RespToken(int expiresIn, String token, String refreshToken, Scope... scopes) {
 		super();
 		mExpiresAt = System.currentTimeMillis() + (expiresIn * 1000) - 5000;
 		mToken = token;
@@ -27,13 +26,13 @@ public final class RespToken extends Response {
 	 * @return The refresh token
 	 *  Will be null in the case of the CLIENT_CREDENTIALS grant
 	 */
-	public final Token getRefreshToken() {
+	public final String getRefreshToken() {
 		return mTokenRefresh;
 	}
 	public final Scope[] getScopes() {
 		return mScopes;
 	}
-	public final Token getToken() {
+	public final String getToken() {
 		return mToken;
 	}
 	

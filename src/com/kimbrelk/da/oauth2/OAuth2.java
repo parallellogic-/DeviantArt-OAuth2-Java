@@ -1,6 +1,5 @@
 package com.kimbrelk.da.oauth2;
 
-import com.kimbrelk.da.oauth2.Token.Type;
 import com.kimbrelk.da.oauth2.response.RespError;
 import com.kimbrelk.da.oauth2.response.RespStashSpace;
 import com.kimbrelk.da.oauth2.response.RespToken;
@@ -10,7 +9,6 @@ import com.kimbrelk.da.oauth2.response.RespUserWhois;
 import com.kimbrelk.da.oauth2.response.Response;
 import com.kimbrelk.da.oauth2.struct.User;
 import com.kimbrelk.da.oauth2.struct.Whois;
-
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -23,7 +21,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import javax.net.ssl.HttpsURLConnection;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -100,7 +97,7 @@ public final class OAuth2 {
 	}
 	
 	private final boolean hasAccessToken() {
-		return !(mToken == null || mToken.getToken() == null || mToken.getToken().getToken() == null);
+		return !(mToken == null || mToken.getToken() == null);
 	}
 	public final boolean hasScopes(Scope... scopes) {
 		Scope[] curScopes = getScopes();
@@ -124,7 +121,7 @@ public final class OAuth2 {
 			return RespError.NO_AUTH;
 		}
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("access_token", mToken.getToken().getToken());
+		params.put("access_token", mToken.getToken());
 		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINT.OAUTH2_REVOKE, params));
 		try {
 			System.out.println(json.toString(5));
@@ -182,7 +179,7 @@ public final class OAuth2 {
 				if (grantType == AuthGrantType.CLIENT_CREDENTIALS) {
 					response = new RespToken(
 							json.getInt("expires_in"), 
-							new Token(Type.CLIENT_CREDENTIALS, json.getString("access_token")), 
+							json.getString("access_token"), 
 							null, 
 							Scope.BROWSE);
 				}
@@ -194,8 +191,8 @@ public final class OAuth2 {
 					}
 					response = new RespToken(
 							json.getInt("expires_in"), 
-							new Token(Type.AUTHENTICATION, json.getString("access_token")), 
-							new Token(Type.REFRESH, json.getString("refresh_token")),
+							json.getString("access_token"), 
+							json.getString("refresh_token"),
 							scopes);
 				}
 				mToken = (RespToken)response;
@@ -215,8 +212,7 @@ public final class OAuth2 {
 			return RespError.INSUFFICIANT_SCOPE;
 		}
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("client_id", mClientCredentials.getId() + "");
-		params.put("access_token", mToken.getToken().getToken());
+		params.put("access_token", mToken.getToken());
 		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINT.USER_DAMNTOKEN, params));
 		try {
 			if (!json.has("error")) {
@@ -240,8 +236,7 @@ public final class OAuth2 {
 			return RespError.INSUFFICIANT_SCOPE;
 		}
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("client_id", mClientCredentials.getId() + "");
-		params.put("access_token", mToken.getToken().getToken());
+		params.put("access_token", mToken.getToken());
 		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINT.STASH_SPACE, params));
 		try {
 			if (!json.has("error")) {
@@ -264,8 +259,7 @@ public final class OAuth2 {
 			return RespError.INSUFFICIANT_SCOPE;
 		}
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("client_id", mClientCredentials.getId() + "");
-		params.put("access_token", mToken.getToken().getToken());
+		params.put("access_token", mToken.getToken());
 		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINT.USER_WHOAMI, params));
 		try {
 			if (!json.has("error")) {
@@ -298,8 +292,7 @@ public final class OAuth2 {
 			return RespError.INVALID_REQUEST;
 		}
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("client_id", mClientCredentials.getId() + "");
-		params.put("access_token", mToken.getToken().getToken());
+		params.put("access_token", mToken.getToken());
 		String postData = "";
 		for(int a=0; a<users.length; a++) {
 			postData += "usernames[" + a + "]=" + users[a] + "\n";
@@ -329,8 +322,7 @@ public final class OAuth2 {
 			return RespError.NO_AUTH;
 		}
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("client_id", mClientCredentials.getId() + "");
-		params.put("access_token", mToken.getToken().getToken());
+		params.put("access_token", mToken.getToken());
 		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINT.UTIL_PLACEBO, params));
 		try {
 			if (json.getString("status").equalsIgnoreCase("success")) {
