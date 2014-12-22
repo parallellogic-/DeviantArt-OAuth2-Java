@@ -131,6 +131,7 @@ public final class OAuth2 {
 		}
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("access_token", mToken.getToken());
+		params.put("token", mToken.getToken());
 		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.OAUTH2_REVOKE, params));
 		try {
 			if (json.getString("status").equalsIgnoreCase("success")) {

@@ -89,7 +89,7 @@ public final class Main {
 			demoUserDamntoken(oAuth2);
 			//demoUserProfileUpdate(oAuth2);
 			demoUserWhoami(oAuth2);
-			demoUserWhois(oAuth2, "pickley");
+			demoUserWhois(oAuth2, "baronbeandip");
 			
 			// Util Demos
 			demoUtilPlacebo(oAuth2);
