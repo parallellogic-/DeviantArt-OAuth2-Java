@@ -11,6 +11,7 @@ public final class RespError extends Response {
 	public final static RespError INSUFFICIANT_SCOPE = new RespError("insufficiant_scope", "The requested resource requires a higher scope than the user has allowed the client to access, client needs to re-authorize.");
 	public final static RespError INVALID_GRANT = new RespError("invalid_grant", "Unsupported grantType.");
 	public final static RespError INVALID_REQUEST = new RespError("invalid_request", "Request field validation failed.");
+	public final static RespError INVALID_TOKEN = new RespError("invalid_request", "Expired oAuth2 user token. The client should request a new one with an access code or a refresh token.");
 	public final static RespError NO_AUTH = new RespError("no_auth", "The client does not have an access_token.");
 	public final static RespError REQUEST_FAILED = new RespError("request_failed", "The client failed to make the request.");
 	

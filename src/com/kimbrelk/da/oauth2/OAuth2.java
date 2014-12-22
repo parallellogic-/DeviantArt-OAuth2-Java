@@ -98,9 +98,12 @@ public final class OAuth2 {
 	public final Version getVersion() {
 		return VERSION;
 	}
-	
+
 	private final boolean hasAccessToken() {
 		return !(mToken == null || mToken.getToken() == null);
+	}
+	private final boolean hasRefreshToken() {
+		return !(mToken == null || mToken.getRefreshToken() == null);
 	}
 	public final boolean hasScopes(Scope... scopes) {
 		Scope[] curScopes = getScopes();
@@ -128,7 +131,6 @@ public final class OAuth2 {
 		params.put("access_token", mToken.getToken());
 		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.OAUTH2_REVOKE, params));
 		try {
-			System.out.println(json.toString(5));
 			if (json.getString("status").equalsIgnoreCase("success")) {
 				return new Response();
 			}
@@ -184,8 +186,7 @@ public final class OAuth2 {
 					response = new RespToken(
 							json.getInt("expires_in"), 
 							json.getString("access_token"), 
-							null, 
-							Scope.BROWSE);
+							null);
 				}
 				else {
 					String[] parse = json.getString("scope").replace(".", "_").toUpperCase().split("[ ]+");
@@ -314,7 +315,7 @@ public final class OAuth2 {
 	}
 	
 	public final Response requestUtilPlacebo() {
-		Response respVerify = verifyScopesAndAuth();
+		Response respVerify = verifyScopesAndAuth(true);
 		if (respVerify.isError()) {
 			return respVerify;
 		}
@@ -436,16 +437,20 @@ public final class OAuth2 {
 			}
 		}
 	}
-
+	
 	public final Response verifyScopesAndAuth(Scope... scopes) {
+		return verifyScopesAndAuth(false, scopes);
+	}
+	public final Response verifyScopesAndAuth(boolean canUseAsUnauthedUser, Scope... scopes) {
 		if (!hasAccessToken()) {
 			return RespError.NO_AUTH;
 		}
-		else if (!hasScopes(scopes)) {
+		else if (!hasRefreshToken() && !canUseAsUnauthedUser) {
+			return RespError.INVALID_TOKEN;
+		}
+		else if (hasRefreshToken() && !hasScopes(scopes)) {
 			return RespError.INSUFFICIANT_SCOPE;
 		}
-		else {
-			return new Response();
-		}
+		return new Response();
 	}
 }
