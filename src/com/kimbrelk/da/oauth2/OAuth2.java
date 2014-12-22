@@ -1,6 +1,7 @@
 package com.kimbrelk.da.oauth2;
 
 import com.kimbrelk.da.oauth2.response.RespError;
+import com.kimbrelk.da.oauth2.response.RespStashPublishUserdata;
 import com.kimbrelk.da.oauth2.response.RespStashSpace;
 import com.kimbrelk.da.oauth2.response.RespToken;
 import com.kimbrelk.da.oauth2.response.RespUserDamntoken;
@@ -209,6 +210,27 @@ public final class OAuth2 {
 		return response;
 	}
 	
+	public final Response requestStashPublishUserdata() {
+		Response respVerify = verifyScopesAndAuth(Scope.STASH, Scope.PUBLISH);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.STASH_PUBLISH_USERDATA, params));
+		try {
+			if (!json.has("error")) {
+				return new RespStashPublishUserdata(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 	public final Response requestStashSpace() {
 		Response respVerify = verifyScopesAndAuth(Scope.STASH);
 		if (respVerify.isError()) {

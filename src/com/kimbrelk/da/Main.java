@@ -4,6 +4,9 @@ import com.kimbrelk.da.oauth2.OAuth2;
 import com.kimbrelk.da.oauth2.Scope;
 import com.kimbrelk.da.oauth2.AuthGrantType;
 import com.kimbrelk.da.oauth2.response.RespError;
+import com.kimbrelk.da.oauth2.response.RespStashPublishUserdata;
+import com.kimbrelk.da.oauth2.response.RespStashSpace;
+import com.kimbrelk.da.oauth2.response.RespUserDamntoken;
 import com.kimbrelk.da.oauth2.response.RespUserWhoami;
 import com.kimbrelk.da.oauth2.response.RespUserWhois;
 import com.kimbrelk.da.oauth2.response.Response;
@@ -11,7 +14,7 @@ import java.util.Scanner;
 
 public final class Main {
 	private final static String URI_REDIRECT = "http://127.0.0.1/";
-	private final static AuthGrantType GRANT_TYPE = AuthGrantType.AUTHORIZATION_CODE;
+	private final static AuthGrantType GRANT_TYPE = AuthGrantType.REFRESH_TOKEN;
 	
 	public final static void main(String[] args) {
 		Scanner in = new Scanner(System.in);
@@ -76,9 +79,12 @@ public final class Main {
 			
 			// Sta.sh Demos
 			// TODO
+			demoStashPublishUserdata(oAuth2);
+			demoStashSpace(oAuth2);
 			
 			// User Demos
 			// TODO
+			demoUserDamntoken(oAuth2);
 			demoUserWhoami(oAuth2);
 			demoUserWhois(oAuth2, "pickley");
 			
@@ -109,6 +115,46 @@ public final class Main {
 		System.out.println();
 	}
 	
+	private final static void demoStashPublishUserdata(OAuth2 oAuth2) {
+		System.out.println("demoStashPublishUserdata()");
+		Response resp;
+		resp = oAuth2.requestStashPublishUserdata();
+		if (resp.isSuccess()) {
+			System.out.println("Agreement[0]: " + ((RespStashPublishUserdata)resp).getAgreements()[0]);
+		}
+		else {
+			System.out.println("Failed to get publishing user data.");
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoStashSpace(OAuth2 oAuth2) {
+		System.out.println("demoStashSpace()");
+		Response resp;
+		resp = oAuth2.requestStashSpace();
+		if (resp.isSuccess()) {
+			System.out.println("Your Sta.sh is " + (int)((RespStashSpace)resp).getPercentUsed() + "% full.");
+		}
+		else {
+			System.out.println("Failed to get your sta.sh space info:");
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+
+	private final static void demoUserDamntoken(OAuth2 oAuth2) {
+		System.out.println("demoUserDamntoken()");
+		Response resp;
+		resp = oAuth2.requestUserDamntoken();
+		if (resp.isSuccess()) {
+			System.out.println("Your dAmn token is " + ((RespUserDamntoken)resp).getDamnToken() + ".");
+		}
+		else {
+			System.out.println("Failed to get your dAmn token:");
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
 	private final static void demoUserWhoami(OAuth2 oAuth2) {
 		System.out.println("demoUserWhoami()");
 		Response resp;
