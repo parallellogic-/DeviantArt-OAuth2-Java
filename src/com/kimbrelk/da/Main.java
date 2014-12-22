@@ -11,7 +11,7 @@ import com.kimbrelk.da.oauth2.response.RespUserWhoami;
 import com.kimbrelk.da.oauth2.response.RespUserWhois;
 import com.kimbrelk.da.oauth2.response.Response;
 import com.kimbrelk.da.oauth2.struct.ArtistLevel;
-import com.kimbrelk.da.oauth2.struct.ArtistSpecialty;
+import com.kimbrelk.da.oauth2.struct.ArtistSpeciality;
 import java.util.Scanner;
 
 public final class Main {
@@ -162,7 +162,7 @@ public final class Main {
 		System.out.println("demoUserProfileUpdate()");
 		Response resp;
 		resp = oAuth2.requestUserProfileUpdate(1, ArtistLevel.STUDENT, 
-				ArtistSpecialty.DESIGN_INTERFACES, null, null, -1, 
+				ArtistSpeciality.DESIGN_INTERFACES, null, null, -1, 
 				null, null);
 		if (resp.isSuccess()) {
 			System.out.println("Profile successfully updated!");

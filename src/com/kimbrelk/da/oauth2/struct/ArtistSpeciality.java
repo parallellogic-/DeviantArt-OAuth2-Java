@@ -1,6 +1,6 @@
 package com.kimbrelk.da.oauth2.struct;
 
-public final class ArtistSpecialty {
+public final class ArtistSpeciality {
 	public final static int CRAFTS = 			1;	
 	public final static int DESIGN_INTERFACES = 2;
 	public final static int DIGITAL = 			3;
