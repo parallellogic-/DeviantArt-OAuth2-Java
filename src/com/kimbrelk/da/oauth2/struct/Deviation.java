@@ -136,7 +136,7 @@ public final class Deviation {
 		return mVideos;
 	}
 	
-	private final class DailyDeviation {
+	public final class DailyDeviation {
 		private String mBody;
 		private User mGiver;
 		private User mSuggester;
@@ -162,7 +162,7 @@ public final class Deviation {
 			return mTime;
 		}
 	}
-	private final class Flash {
+	public final class Flash {
 		private int mHeight;
 		private String mSource;
 		private int mWidth;
@@ -183,7 +183,7 @@ public final class Deviation {
 			return mWidth;
 		}
 	}
-	private final class Image {
+	public final class Image {
 		private int mHeight;
 		private boolean mIsTransparent;
 		private String mSource;
@@ -210,7 +210,7 @@ public final class Deviation {
 			return mIsTransparent;
 		}
 	}
-	private final class Stats {
+	public final class Stats {
 		private int mComments;
 		private int mFavourites;
 		
@@ -226,7 +226,7 @@ public final class Deviation {
 			return mFavourites;
 		}
 	}
-	private final class Video {
+	public final class Video {
 		private int mDuration;
 		private long mFileSize;
 		private String mQuality;

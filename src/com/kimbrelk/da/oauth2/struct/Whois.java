@@ -1,11 +1,9 @@
 package com.kimbrelk.da.oauth2.struct;
 
+import com.kimbrelk.da.util.Util;
 import java.util.Date;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.kimbrelk.da.util.Util;
 
 public final class Whois {
 	private User mUser;
@@ -13,12 +11,6 @@ public final class Whois {
 	private String mTypeName;
 	private Date mJoinDate;
 	
-	public Whois(User user, String realName, String typeName, String joinDate) {
-		mUser = user;
-		mRealName = realName;
-		mTypeName = typeName;
-		mJoinDate = new Date(joinDate);
-	}
 	public Whois(JSONObject json) throws JSONException {
 		mUser = new User(json.getJSONObject("user"));
 		mRealName = json.getString("realname");

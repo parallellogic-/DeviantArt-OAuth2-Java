@@ -26,29 +26,19 @@ public final class User {
 	private Profile mProfile;
 	private Stats mStats;
 	private Type mType;
-
-	public User(String name, String id, String type, String icon) {
-		mIcon = icon;
-		mId = id;
-		mName = name;
-		if (type != null) {
-			mType = Type.valueOf(type.toUpperCase().replace("-", "_"));
-		}
-		else {
-			mType = null;
-		}
-		mDetails = null;
-		mGeo = null;
-		mProfile = null;
-		mStats = null;
-	}
+	
 	public User(JSONObject json) throws JSONException {
 		mIcon = json.getString("usericon");
 		mId = json.getString("userid");
 		mName = json.getString("username");
 		mType = null;
 		if (json.has("type")) {
-			mType = Type.valueOf(json.getString("type").toUpperCase().replace("-", "_"));
+			try {
+				mType = Type.valueOf(json.getString("type").toUpperCase().replace("-", "_"));
+			}
+			catch (IllegalArgumentException e) {
+				
+			}
 		}
 		if (json.has("details")) {
 			mDetails = new Details(json.getJSONObject("details"));
@@ -93,7 +83,7 @@ public final class User {
 		return mType;
 	}
 	
-	private final class Details {
+	public final class Details {
 		private int mAge;
 		private String mGender;
 		private Date mJoinDate;
@@ -128,7 +118,7 @@ public final class User {
 				(mGender.equalsIgnoreCase("f") || mGender.equalsIgnoreCase("female"));
 		}
 	}
-	private final class Geo {
+	public final class Geo {
 		private String mCountry;
 		private int mCountryId;
 		private String mTimezone;
@@ -154,7 +144,7 @@ public final class User {
 			return mTimezone;
 		}
 	}
-	private final class Profile {
+	public final class Profile {
 		private String mArtistLevel;
 		private String mArtistSpeciality;
 		private String mCoverPhoto;
@@ -174,8 +164,34 @@ public final class User {
 			mTagline = json.getString("tagline");
 			mWebsite = json.getString("website");
 		}
+
+		public final boolean isArtist() {
+			return mIsArtist;
+		}
+
+		public final String getArtistLevel() {
+			return mArtistLevel;
+		}
+		public final String getArtistSpeciality() {
+			return mArtistSpeciality;
+		}
+		public final String getCoverPhoto() {
+			return mCoverPhoto;
+		}
+		public final Deviation getProfilePic() {
+			return mProfilePic;
+		}
+		public final String getRealName() {
+			return mRealName;
+		}
+		public final String getTagline() {
+			return mTagline;
+		}
+		public final String get() {
+			return mWebsite;
+		}
 	}
-	private final class Stats {
+	public final class Stats {
 		private int mFriends;
 		private int mWatchers;
 		
@@ -187,7 +203,7 @@ public final class User {
 			mFriends = json.getInt("friends");
 			mWatchers = json.getInt("watchers");
 		}
-
+		
 		public final int getFriends() {
 			return mFriends;
 		}

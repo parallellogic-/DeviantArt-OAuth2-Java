@@ -27,6 +27,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+@SuppressWarnings("static-access")
 public final class OAuth2 {
 	private final static Version VERSION = new Version(1, 20141204);
 	private final static Endpoints_v1 ENDPOINTS = new Endpoints_v1();
@@ -346,14 +347,7 @@ public final class OAuth2 {
 		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.USER_WHOAMI, params));
 		try {
 			if (!json.has("error")) {
-				return new RespUserWhoami(
-					new User(
-						json.getString("username"),
-						json.getString("userid"),
-						null,//json.getString("type"),
-						json.getString("usericon")
-					)
-				);
+				return new RespUserWhoami(new User(json));
 			}
 			else {
 				return new RespError(json);
