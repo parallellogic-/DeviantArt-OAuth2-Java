@@ -1,0 +1,51 @@
+package com.kimbrelk.da.oauth2.struct;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+public final class Watch {
+	private boolean mActivity;
+	private boolean mCollections;
+	private boolean mCritiques;
+	private boolean mDeviations;
+	private boolean mForums;
+	private boolean mIsFriend;
+	private boolean mJournals;
+	private boolean mScraps;
+	
+	public Watch(JSONObject json) throws JSONException {
+		mActivity = json.getBoolean("activity");
+		mCollections = json.getBoolean("collections");
+		mCritiques = json.getBoolean("critiques");
+		mDeviations = json.getBoolean("deviations");
+		mForums = json.getBoolean("forum_threads");
+		mIsFriend = json.getBoolean("friend");
+		mJournals = json.getBoolean("journals");
+		mScraps = json.getBoolean("scraps");
+	}
+	
+	public final boolean activity() {
+		return mActivity;
+	}
+	public final boolean collections() {
+		return mCollections;
+	}
+	public final boolean critiques() {
+		return mCritiques;
+	}
+	public final boolean deviations() {
+		return mDeviations;
+	}
+	public final boolean forums() {
+		return mForums;
+	}
+	public final boolean isFriend() {
+		return mIsFriend;
+	}
+	public final boolean journals() {
+		return mJournals;
+	}
+	public final boolean scraps() {
+		return mScraps;
+	}
+}

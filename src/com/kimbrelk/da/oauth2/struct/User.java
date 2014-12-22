@@ -195,10 +195,6 @@ public final class User {
 		private int mFriends;
 		private int mWatchers;
 		
-		public Stats(int watchers, int friends) {
-			mFriends = friends;
-			mWatchers = watchers;
-		}
 		public Stats(JSONObject json) throws JSONException {
 			mFriends = json.getInt("friends");
 			mWatchers = json.getInt("watchers");
