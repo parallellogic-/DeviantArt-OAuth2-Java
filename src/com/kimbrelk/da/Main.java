@@ -10,19 +10,22 @@ import com.kimbrelk.da.oauth2.response.RespUserDamntoken;
 import com.kimbrelk.da.oauth2.response.RespUserWhoami;
 import com.kimbrelk.da.oauth2.response.RespUserWhois;
 import com.kimbrelk.da.oauth2.response.Response;
+import com.kimbrelk.da.oauth2.struct.ArtistLevel;
+import com.kimbrelk.da.oauth2.struct.ArtistSpecialty;
+
 import java.util.Scanner;
 
 public final class Main {
 	private final static String URI_REDIRECT = "http://127.0.0.1/";
-	private final static AuthGrantType GRANT_TYPE = AuthGrantType.REFRESH_TOKEN;
+	private final static AuthGrantType GRANT_TYPE = AuthGrantType.AUTHORIZATION_CODE;
 	
 	public final static void main(String[] args) {
 		Scanner in = new Scanner(System.in);
-		Response resp;
 		
 		// Create a new OAuth2 session, Replace 'new MyCredentials()' with a ClientCredentials 
 		// object with your client's credentials
 		OAuth2 oAuth2 = new OAuth2(new MyCredentials(), "Java OAuth2 Demo");
+		Response resp;
 		if (GRANT_TYPE == AuthGrantType.CLIENT_CREDENTIALS) {
 			// Authenticate using the CLIENT_CREDENTIALS grant (no user login)
 			resp = oAuth2.requestAuthToken(AuthGrantType.CLIENT_CREDENTIALS, null, null);
@@ -85,6 +88,7 @@ public final class Main {
 			// User Demos
 			// TODO
 			demoUserDamntoken(oAuth2);
+			//demoUserProfileUpdate(oAuth2);
 			demoUserWhoami(oAuth2);
 			demoUserWhois(oAuth2, "pickley");
 			
@@ -151,6 +155,21 @@ public final class Main {
 		}
 		else {
 			System.out.println("Failed to get your dAmn token:");
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoUserProfileUpdate(OAuth2 oAuth2) {
+		System.out.println("demoUserProfileUpdate()");
+		Response resp;
+		resp = oAuth2.requestUserProfileUpdate(1, ArtistLevel.STUDENT, 
+				ArtistSpecialty.DESIGN_INTERFACES, null, null, -1, 
+				null, null);
+		if (resp.isSuccess()) {
+			System.out.println("Profile successfully updated!");
+		}
+		else {
+			System.out.println("Failed to get your user info:");
 			System.out.println(resp);
 		}
 		System.out.println();

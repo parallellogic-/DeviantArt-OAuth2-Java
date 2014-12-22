@@ -21,6 +21,8 @@ import java.security.InvalidParameterException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
+
 import javax.net.ssl.HttpsURLConnection;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -274,6 +276,66 @@ public final class OAuth2 {
 			return null;
 		}
 	}
+	/**
+	 * Update the authorized user's profile
+	 * @param userIsArtist -1(ignore), 0(false), 1(true)
+	 * @param artistLevel See ArtistLevel, may be null to ignore
+	 * @param artistSpecialty See ArtistSpecialty, may be null to ignore
+	 * @param realName May be null to ignore
+	 * @param tagline May be null to ignore
+	 * @param countryid See /user/profile/update dev docs for values, may be null to ignore
+	 * @param website May be null to ignore
+	 * @param bio May be null to ignore
+	 * @return Response from dA
+	 */
+	public final Response requestUserProfileUpdate(int userIsArtist, int artistLevel, 
+			int artistSpecialty, String realName, String tagline, int countryid, String website, 
+			String bio) {
+		Response respVerify = verifyScopesAndAuth(Scope.BASIC, Scope.USER_MANAGE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		Map<String, String> paramsPost = new HashMap<String, String>();
+		if (userIsArtist == 0 || userIsArtist == 1) {
+			paramsPost.put("user_is_artist", userIsArtist + "");
+		}
+		if (artistLevel != -1) {
+			paramsPost.put("artist_level", "" + artistLevel);
+		}
+		if (artistSpecialty != -1) {
+			paramsPost.put("artist_specialty", "" + artistSpecialty);
+		}
+		if (realName != null) {
+			paramsPost.put("real_name", realName);
+		}
+		if (tagline != null) {
+			paramsPost.put("tagline", tagline);
+		}
+		if (countryid != -1) {
+			paramsPost.put("countryid", "" + countryid);
+		}
+		if (website != null) {
+			paramsPost.put("website", website);
+		}
+		if (bio != null) {
+			paramsPost.put("bio", bio);
+		}
+		JSONObject json = requestJSON(Verb.POST, createURL(ENDPOINTS.USER_PROFILE_UPDATE, params), paramsPost);
+		try {
+			if (!json.has("error")) {
+				return new Response();
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 	public final Response requestUserWhoami() {
 		Response respVerify = verifyScopesAndAuth(Scope.USER);
 		if (respVerify.isError()) {
@@ -359,7 +421,21 @@ public final class OAuth2 {
 	}
 	
 	protected final JSONObject requestJSON(Verb verb, String url) {
-		return requestJSON(verb, url, null);
+		return requestJSON(verb, url, (String)null);
+	}
+	protected final JSONObject requestJSON(Verb verb, String url, Map<String, String> postParams) {
+		String postData = "";
+		Set<String> keys = postParams.keySet();
+		int len = keys.size();
+		int a=0;
+		for(String key: keys) {
+			postData += key + "=" + postParams.get(key);
+			if (a < len - 1) {
+				postData += "&";
+			}
+			a++;
+		}
+		return requestJSON(verb, url, postData);
 	}
 	protected final JSONObject requestJSON(Verb verb, String url, String postData) {
 		try {
