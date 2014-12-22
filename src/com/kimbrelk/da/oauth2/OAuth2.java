@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
 import javax.net.ssl.HttpsURLConnection;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -279,11 +278,11 @@ public final class OAuth2 {
 	/**
 	 * Update the authorized user's profile
 	 * @param userIsArtist -1(ignore), 0(false), 1(true)
-	 * @param artistLevel See ArtistLevel, may be null to ignore
-	 * @param artistSpecialty See ArtistSpecialty, may be null to ignore
+	 * @param artistLevel See ArtistLevel, may be -1 to ignore
+	 * @param artistSpecialty See ArtistSpecialty, may be -1 to ignore
 	 * @param realName May be null to ignore
 	 * @param tagline May be null to ignore
-	 * @param countryid See /user/profile/update dev docs for values, may be null to ignore
+	 * @param countryid See /user/profile/update dev docs for values, may be -1 to ignore
 	 * @param website May be null to ignore
 	 * @param bio May be null to ignore
 	 * @return Response from dA
@@ -291,7 +290,7 @@ public final class OAuth2 {
 	public final Response requestUserProfileUpdate(int userIsArtist, int artistLevel, 
 			int artistSpecialty, String realName, String tagline, int countryid, String website, 
 			String bio) {
-		Response respVerify = verifyScopesAndAuth(Scope.BASIC, Scope.USER_MANAGE);
+		Response respVerify = verifyScopesAndAuth(Scope.BROWSE, Scope.USER_MANAGE);
 		if (respVerify.isError()) {
 			return respVerify;
 		}

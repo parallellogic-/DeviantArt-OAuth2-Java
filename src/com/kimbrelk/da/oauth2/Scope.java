@@ -1,7 +1,7 @@
 package com.kimbrelk.da.oauth2;
 
 public enum Scope {
-	BASIC, 			/* USER + STASH */
+	//BASIC, 			/* USER + STASH */
 	BROWSE,
 	COLLECTION,
 	COMMENT_POST,

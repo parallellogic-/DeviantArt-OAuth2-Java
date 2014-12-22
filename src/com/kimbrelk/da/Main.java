@@ -12,7 +12,6 @@ import com.kimbrelk.da.oauth2.response.RespUserWhois;
 import com.kimbrelk.da.oauth2.response.Response;
 import com.kimbrelk.da.oauth2.struct.ArtistLevel;
 import com.kimbrelk.da.oauth2.struct.ArtistSpecialty;
-
 import java.util.Scanner;
 
 public final class Main {
