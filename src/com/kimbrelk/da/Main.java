@@ -3,6 +3,7 @@ package com.kimbrelk.da;
 import com.kimbrelk.da.oauth2.OAuth2;
 import com.kimbrelk.da.oauth2.Scope;
 import com.kimbrelk.da.oauth2.AuthGrantType;
+import com.kimbrelk.da.oauth2.response.RespBrowseDailydeviations;
 import com.kimbrelk.da.oauth2.response.RespError;
 import com.kimbrelk.da.oauth2.response.RespStashPublishUserdata;
 import com.kimbrelk.da.oauth2.response.RespStashSpace;
@@ -16,7 +17,7 @@ import java.util.Scanner;
 
 public final class Main {
 	private final static String URI_REDIRECT = "http://127.0.0.1/";
-	private final static AuthGrantType GRANT_TYPE = AuthGrantType.AUTHORIZATION_CODE;
+	private final static AuthGrantType GRANT_TYPE = AuthGrantType.CLIENT_CREDENTIALS;
 	
 	public final static void main(String[] args) {
 		Scanner in = new Scanner(System.in);
@@ -60,6 +61,7 @@ public final class Main {
 			
 			// Browse Demos
 			// TODO
+			demoBrowseDailydeviations(oAuth2);
 			
 			// Collections Demos
 			// TODO
@@ -110,6 +112,21 @@ public final class Main {
 		Response resp = oAuth2.requestAuthRevoke();
 		if (resp.isSuccess()) {
 			System.out.println("Your authorization has been revoked.");
+		}
+		else {
+			System.out.println("Auth Revoke Failed:");
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	
+	private final static void demoBrowseDailydeviations(OAuth2 oAuth2) {
+		// Revoke access token and force user reauthorization
+		System.out.println("demoBrowseDailydeviations()");
+		Response resp = oAuth2.requestBrowseDailydeviations("2001-12-25");
+		if (resp.isSuccess()) {
+			System.out.println("Title of first DD on 2001-12-25: \"" + 
+				((RespBrowseDailydeviations)resp).getDeviations()[0].getTitle() + "\"");
 		}
 		else {
 			System.out.println("Auth Revoke Failed:");

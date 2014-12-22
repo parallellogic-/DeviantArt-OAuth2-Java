@@ -1,5 +1,6 @@
 package com.kimbrelk.da.oauth2;
 
+import com.kimbrelk.da.oauth2.response.RespBrowseDailydeviations;
 import com.kimbrelk.da.oauth2.response.RespError;
 import com.kimbrelk.da.oauth2.response.RespStashPublishUserdata;
 import com.kimbrelk.da.oauth2.response.RespStashSpace;
@@ -18,6 +19,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.security.InvalidParameterException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -211,6 +216,40 @@ public final class OAuth2 {
 			e.printStackTrace();
 		}
 		return response;
+	}
+
+	public final Response requestBrowseDailydeviations(int year, int month, int day) {
+		Calendar c = Calendar.getInstance();
+		c.set(year, month-1, day);
+		return requestBrowseDailydeviations(c.getTime());
+	}
+	public final Response requestBrowseDailydeviations(Date date) {
+		final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		return requestBrowseDailydeviations(dateFormat.format(date));
+	}
+	public final Response requestBrowseDailydeviations(String date) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		if (date != null) {
+			params.put("date", date);
+		}
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.BROWSE_DAILYDEVIATIONS, params));
+		try {
+			if (!json.has("error")) {
+				return new RespBrowseDailydeviations(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	public final Response requestStashPublishUserdata() {

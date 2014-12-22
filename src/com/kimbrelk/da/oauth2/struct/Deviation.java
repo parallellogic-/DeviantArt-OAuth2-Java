@@ -51,7 +51,7 @@ public final class Deviation {
 		if (json.has("preview")) {
 			mPreview = new Image(json.getJSONObject("preview"));
 		}
-		mPrintId = json.getString("printid");
+		mPrintId = json.optString("printid");
 		mPublishedTime = json.getLong("published_time");
 		mStats = new Stats(json.getJSONObject("stats"));
 		if (json.has("thumbs")) {
@@ -145,7 +145,9 @@ public final class Deviation {
 		public DailyDeviation(JSONObject json) throws JSONException {
 			mBody = json.getString("body");
 			mGiver = new User(json.getJSONObject("giver"));
-			mSuggester = new User(json.getJSONObject("suggester"));
+			if (json.has("suggester")) {
+				mSuggester = new User(json.getJSONObject("suggester"));
+			}
 			mTime = Util.stringToDate(json.getString("time"));
 		}
 

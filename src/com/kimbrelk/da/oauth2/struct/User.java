@@ -88,14 +88,9 @@ public final class User {
 		private String mGender;
 		private Date mJoinDate;
 		
-		public Details(String gender, int age, String joinDate) {
-			mGender = gender;
-			mAge = age;
-			mJoinDate = Util.stringToDate(joinDate);
-		}
 		public Details(JSONObject json) throws JSONException {
-			mGender = json.getString("sex");
-			mAge = json.getInt("age");
+			mGender = json.optString("sex");
+			mAge = json.optInt("age");
 			mJoinDate = Util.stringToDate(json.getString("joindate"));
 		}
 		
@@ -155,8 +150,8 @@ public final class User {
 		private String mWebsite;
 		
 		public Profile(JSONObject json) throws JSONException {
-			mArtistLevel = json.getString("artist_level");
-			mArtistSpeciality = json.getString("artist_speciality");
+			mArtistLevel = json.optString("artist_level");
+			mArtistSpeciality = json.optString("artist_speciality");
 			mCoverPhoto = json.getString("cover_photo");
 			mIsArtist = json.getBoolean("user_is_artist");
 			mProfilePic = new Deviation(json.getJSONObject("profile_pic"));
