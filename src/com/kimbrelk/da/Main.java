@@ -3,7 +3,8 @@ package com.kimbrelk.da;
 import com.kimbrelk.da.oauth2.OAuth2;
 import com.kimbrelk.da.oauth2.Scope;
 import com.kimbrelk.da.oauth2.AuthGrantType;
-import com.kimbrelk.da.oauth2.response.RespBrowseDailydeviations;
+import com.kimbrelk.da.oauth2.response.RespDeviations;
+import com.kimbrelk.da.oauth2.response.RespDeviationsQuery;
 import com.kimbrelk.da.oauth2.response.RespError;
 import com.kimbrelk.da.oauth2.response.RespStashPublishUserdata;
 import com.kimbrelk.da.oauth2.response.RespStashSpace;
@@ -13,6 +14,8 @@ import com.kimbrelk.da.oauth2.response.RespUserWhois;
 import com.kimbrelk.da.oauth2.response.Response;
 import com.kimbrelk.da.oauth2.struct.ArtistLevel;
 import com.kimbrelk.da.oauth2.struct.ArtistSpeciality;
+import com.kimbrelk.da.oauth2.struct.TimeRange;
+
 import java.util.Scanner;
 
 public final class Main {
@@ -62,6 +65,9 @@ public final class Main {
 			// Browse Demos
 			// TODO
 			demoBrowseDailydeviations(oAuth2);
+			demoBrowseHot(oAuth2);
+			demoBrowseNewest(oAuth2);
+			demoBrowsePopular(oAuth2);
 			
 			// Collections Demos
 			// TODO
@@ -121,12 +127,50 @@ public final class Main {
 	}
 	
 	private final static void demoBrowseDailydeviations(OAuth2 oAuth2) {
-		// Revoke access token and force user reauthorization
 		System.out.println("demoBrowseDailydeviations()");
 		Response resp = oAuth2.requestBrowseDailydeviations("2001-12-25");
 		if (resp.isSuccess()) {
 			System.out.println("Title of first DD on 2001-12-25: \"" + 
-				((RespBrowseDailydeviations)resp).getDeviations()[0].getTitle() + "\"");
+				((RespDeviations)resp).getDeviations()[0].getTitle() + "\"");
+		}
+		else {
+			System.out.println("Auth Revoke Failed:");
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoBrowseHot(OAuth2 oAuth2) {
+		System.out.println("demoBrowseHot()");
+		Response resp = oAuth2.requestBrowseHot();
+		if (resp.isSuccess()) {
+			System.out.println("Title of first \'hot\' deviation: \"" + 
+				((RespDeviationsQuery)resp).getDeviations()[0].getTitle() + "\"");
+		}
+		else {
+			System.out.println("Auth Revoke Failed:");
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoBrowseNewest(OAuth2 oAuth2) {
+		System.out.println("demoBrowseNewest()");
+		Response resp = oAuth2.requestBrowseNewest(null, "java");
+		if (resp.isSuccess()) {
+			System.out.println("Title of newest \'java\' deviation: \"" + 
+				((RespDeviationsQuery)resp).getDeviations()[0].getTitle() + "\"");
+		}
+		else {
+			System.out.println("Auth Revoke Failed:");
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoBrowsePopular(OAuth2 oAuth2) {
+		System.out.println("demoBrowsePopular()");
+		Response resp = oAuth2.requestBrowsePopular(null, "java", -1, -1, TimeRange.ALLTIME);
+		if (resp.isSuccess()) {
+			System.out.println("Title most popular \'java\' deviation of all time: \"" + 
+				((RespDeviationsQuery)resp).getDeviations()[0].getTitle() + "\"");
 		}
 		else {
 			System.out.println("Auth Revoke Failed:");

@@ -1,6 +1,7 @@
 package com.kimbrelk.da.oauth2;
 
-import com.kimbrelk.da.oauth2.response.RespBrowseDailydeviations;
+import com.kimbrelk.da.oauth2.response.RespDeviations;
+import com.kimbrelk.da.oauth2.response.RespDeviationsQuery;
 import com.kimbrelk.da.oauth2.response.RespError;
 import com.kimbrelk.da.oauth2.response.RespStashPublishUserdata;
 import com.kimbrelk.da.oauth2.response.RespStashSpace;
@@ -240,7 +241,124 @@ public final class OAuth2 {
 		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.BROWSE_DAILYDEVIATIONS, params));
 		try {
 			if (!json.has("error")) {
-				return new RespBrowseDailydeviations(json);
+				return new RespDeviations(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestBrowseHot() {
+		return requestBrowseHot(null, -1, -1);
+	}
+	public final Response requestBrowseHot(String categoryPath) {
+		return requestBrowseHot(categoryPath, -1, -1);
+	}
+	public final Response requestBrowseHot(String categoryPath, int offset, int limit) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		if (categoryPath != null) {
+			params.put("category_path", categoryPath);
+		}
+		if (offset != -1) {
+			params.put("offset", offset + "");
+		}
+		if (limit != -1) {
+			params.put("limit", limit + "");
+		}
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.BROWSE_HOT, params));
+		try {
+			if (!json.has("error")) {
+				return new RespDeviationsQuery(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestBrowseNewest() {
+		return requestBrowseNewest(null, null, -1, -1);
+	}
+	public final Response requestBrowseNewest(String categoryPath, String query) {
+		return requestBrowseNewest(categoryPath, query, -1, -1);
+	}
+	public final Response requestBrowseNewest(String categoryPath, String query, int offset, int limit) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		if (categoryPath != null) {
+			params.put("category_path", categoryPath);
+		}
+		if (query != null) {
+			params.put("q", query);
+		}
+		if (offset != -1) {
+			params.put("offset", offset + "");
+		}
+		if (limit != -1) {
+			params.put("limit", limit + "");
+		}
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.BROWSE_NEWEST, params));
+		try {
+			if (!json.has("error")) {
+				return new RespDeviationsQuery(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestBrowsePopular() {
+		return requestBrowsePopular(null, null, -1, -1, null);
+	}
+	public final Response requestBrowsePopular(String categoryPath, String query,String timeRange) {
+		return requestBrowsePopular(categoryPath, query, -1, -1, timeRange);
+	}
+	public final Response requestBrowsePopular(String categoryPath, String query, int offset, int limit, String timeRange) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		if (categoryPath != null) {
+			params.put("category_path", categoryPath);
+		}
+		if (query != null) {
+			params.put("q", query);
+		}
+		if (offset != -1) {
+			params.put("offset", offset + "");
+		}
+		if (limit != -1) {
+			params.put("limit", limit + "");
+		}
+		if (timeRange != null) {
+			params.put("timerange", timeRange);
+		}
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.BROWSE_POPULAR, params));
+		try {
+			if (!json.has("error")) {
+				return new RespDeviationsQuery(json);
 			}
 			else {
 				return new RespError(json);

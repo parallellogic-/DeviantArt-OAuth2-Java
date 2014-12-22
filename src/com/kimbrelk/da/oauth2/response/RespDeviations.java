@@ -5,10 +5,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public final class RespBrowseDailydeviations extends Response {
+public class RespDeviations extends Response {
 	private Deviation[] mResults;
 	
-	public RespBrowseDailydeviations(JSONObject json) throws JSONException {
+	public RespDeviations(JSONObject json) throws JSONException {
 		super();
 		JSONArray jsonResults = json.getJSONArray("results");
 		mResults = new Deviation[jsonResults.length()];
