@@ -1,6 +1,7 @@
 package com.kimbrelk.da.oauth2;
 
 import com.kimbrelk.da.oauth2.response.RespBrowseMorelikethisPreview;
+import com.kimbrelk.da.oauth2.response.RespBrowseTagsSearch;
 import com.kimbrelk.da.oauth2.response.RespDeviations;
 import com.kimbrelk.da.oauth2.response.RespDeviationsQuery;
 import com.kimbrelk.da.oauth2.response.RespError;
@@ -459,6 +460,30 @@ public final class OAuth2 {
 		try {
 			if (!json.has("error")) {
 				return new RespDeviationsQuery(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestBrowseTagsSearch(String tag) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		if (tag != null) {
+			params.put("tag_name", tag);
+		}
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.BROWSE_TAGS_SEARCH, params));
+		try {
+			if (!json.has("error")) {
+				return new RespBrowseTagsSearch(json);
 			}
 			else {
 				return new RespError(json);

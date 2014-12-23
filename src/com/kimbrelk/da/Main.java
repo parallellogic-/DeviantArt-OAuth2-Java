@@ -4,6 +4,7 @@ import com.kimbrelk.da.oauth2.OAuth2;
 import com.kimbrelk.da.oauth2.Scope;
 import com.kimbrelk.da.oauth2.AuthGrantType;
 import com.kimbrelk.da.oauth2.response.RespBrowseMorelikethisPreview;
+import com.kimbrelk.da.oauth2.response.RespBrowseTagsSearch;
 import com.kimbrelk.da.oauth2.response.RespDeviations;
 import com.kimbrelk.da.oauth2.response.RespDeviationsQuery;
 import com.kimbrelk.da.oauth2.response.RespError;
@@ -71,8 +72,9 @@ public final class Main {
 			//demoBrowseNewest(oAuth2);
 			//demoBrowsePopular(oAuth2);
 			//demoBrowseTags(oAuth2);
+			//demoBrowseTagsSearch(oAuth2);
 			//demoBrowseUndiscovered(oAuth2);
-			demoBrowseUserJournals(oAuth2);
+			//demoBrowseUserJournals(oAuth2);
 			
 			// Collections Demos
 			// TODO
@@ -209,6 +211,18 @@ public final class Main {
 		if (resp.isSuccess()) {
 			System.out.println("Title of first \'android\' tagged deviation: \"" + 
 				((RespDeviationsQuery)resp).getDeviations()[0].getTitle() + "\"");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoBrowseTagsSearch(OAuth2 oAuth2) {
+		System.out.println("demoBrowseTagsSearch()");
+		Response resp = oAuth2.requestBrowseTagsSearch("anim");
+		if (resp.isSuccess()) {
+			System.out.println("First tag from search of \'anim\': \"" + 
+				((RespBrowseTagsSearch)resp).getTags()[0] + "\"");
 		}
 		else {
 			System.out.println(resp);
