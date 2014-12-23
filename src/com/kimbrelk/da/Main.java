@@ -1,11 +1,14 @@
 package com.kimbrelk.da;
 
+import com.kimbrelk.da.oauth2.ClientCredentials;
 import com.kimbrelk.da.oauth2.OAuth2;
 import com.kimbrelk.da.oauth2.Scope;
 import com.kimbrelk.da.oauth2.AuthGrantType;
 import com.kimbrelk.da.oauth2.response.RespBrowseMorelikethisPreview;
 import com.kimbrelk.da.oauth2.response.RespBrowseTagsSearch;
 import com.kimbrelk.da.oauth2.response.RespCategory;
+import com.kimbrelk.da.oauth2.response.RespDeviation;
+import com.kimbrelk.da.oauth2.response.RespDeviationContent;
 import com.kimbrelk.da.oauth2.response.RespDeviations;
 import com.kimbrelk.da.oauth2.response.RespDeviationsQuery;
 import com.kimbrelk.da.oauth2.response.RespError;
@@ -21,15 +24,15 @@ import com.kimbrelk.da.oauth2.struct.TimeRange;
 import java.util.Scanner;
 
 public final class Main {
-	private final static String URI_REDIRECT = "http://127.0.0.1/";
+	private final static ClientCredentials CREDENTIALS = new MyCredentials();
 	private final static AuthGrantType GRANT_TYPE = AuthGrantType.CLIENT_CREDENTIALS;
+	private final static String URI_REDIRECT = "http://127.0.0.1/";
 	
 	public final static void main(String[] args) {
 		Scanner in = new Scanner(System.in);
 		
-		// Create a new OAuth2 session, Replace 'new MyCredentials()' with a ClientCredentials 
-		// object with your client's credentials
-		OAuth2 oAuth2 = new OAuth2(new MyCredentials(), "Java OAuth2 Demo");
+		// Create a new OAuth2 session
+		OAuth2 oAuth2 = new OAuth2(CREDENTIALS, "Java OAuth2 Demo");
 		Response resp;
 		if (GRANT_TYPE == AuthGrantType.CLIENT_CREDENTIALS) {
 			// Authenticate using the CLIENT_CREDENTIALS grant (no user login)
@@ -88,6 +91,8 @@ public final class Main {
 			
 			// Deviation Demos
 			// TODO
+			//demoDeviation(oAuth2);
+			//demoDeviationContent(oAuth2);
 			
 			// Feed Demos
 			// TODO
@@ -97,6 +102,7 @@ public final class Main {
 			
 			// Sta.sh Demos
 			// TODO
+			//demoStashPublishCategorytree(oAuth2);
 			//demoStashPublishUserdata(oAuth2);
 			//demoStashSpace(oAuth2);
 			
@@ -105,7 +111,7 @@ public final class Main {
 			//demoUserDamntoken(oAuth2);
 			//demoUserProfileUpdate(oAuth2);
 			//demoUserWhoami(oAuth2);
-			//demoUserWhois(oAuth2, "baronbeandip");
+			//demoUserWhois(oAuth2);
 			
 			// Util Demos
 			//demoUtilPlacebo(oAuth2);
@@ -267,6 +273,43 @@ public final class Main {
 		System.out.println();
 	}
 	
+	private final static void demoDeviation(OAuth2 oAuth2) {
+		System.out.println("demoDeviation()");
+		Response resp = oAuth2.requestDeviation("AA4C62ED-1020-3DDA-66BE-C3DD17C52CA2");
+		if (resp.isSuccess()) {
+			System.out.println("Deviation title: \"" + 
+				((RespDeviation)resp).getDeviation().getTitle() + "\"");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoDeviationContent(OAuth2 oAuth2) {
+		System.out.println("demoDeviationContent()");
+		Response resp = oAuth2.requestDeviationContent("A2584B72-8F09-CC77-1950-A7558EFA73FA");
+		if (resp.isSuccess()) {
+			System.out.println("Deviation html: \"" + 
+				((RespDeviationContent)resp).getHTML() + "\"");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	
+	private final static void demoStashPublishCategorytree(OAuth2 oAuth2) {
+		System.out.println("demoStashPublishCategorytree()");
+		Response resp = oAuth2.requestStashPublishCategorytree("/", "png");
+		if (resp.isSuccess()) {
+			System.out.println("First \'png\' accepting category in \'/\': \"" + 
+				((RespCategory)resp).getCategories()[0].getTitle() + "\"");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
 	private final static void demoStashPublishUserdata(OAuth2 oAuth2) {
 		System.out.println("demoStashPublishUserdata()");
 		Response resp;
@@ -335,9 +378,10 @@ public final class Main {
 		}
 		System.out.println();
 	}
-	private final static void demoUserWhois(OAuth2 oAuth2, String username) {
+	private final static void demoUserWhois(OAuth2 oAuth2) {
 		System.out.println("demoUserWhois()");
 		Response resp;
+		String username = "baronbeandip";
 		resp = oAuth2.requestUserWhois(username);
 		if (resp.isSuccess()) {
 			System.out.println(username + "'s real name is \'" + ((RespUserWhois)resp).getWhoisResults()[0].getRealName() + "\'.");

@@ -3,6 +3,8 @@ package com.kimbrelk.da.oauth2;
 import com.kimbrelk.da.oauth2.response.RespBrowseMorelikethisPreview;
 import com.kimbrelk.da.oauth2.response.RespBrowseTagsSearch;
 import com.kimbrelk.da.oauth2.response.RespCategory;
+import com.kimbrelk.da.oauth2.response.RespDeviation;
+import com.kimbrelk.da.oauth2.response.RespDeviationContent;
 import com.kimbrelk.da.oauth2.response.RespDeviations;
 import com.kimbrelk.da.oauth2.response.RespDeviationsQuery;
 import com.kimbrelk.da.oauth2.response.RespError;
@@ -222,6 +224,9 @@ public final class OAuth2 {
 		return response;
 	}
 	
+	public final Response requestBrowseCategorytree() {
+		return requestBrowseCategorytree("/");
+	}
 	public final Response requestBrowseCategorytree(String categoryPath) {
 		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
 		if (respVerify.isError()) {
@@ -229,9 +234,10 @@ public final class OAuth2 {
 		}
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("access_token", mToken.getToken());
-		if (categoryPath != null) {
-			params.put("catpath", categoryPath);
+		if (categoryPath == null) {
+			categoryPath = "/";
 		}
+		params.put("catpath", categoryPath);
 		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.BROWSE_CATEGORYTREE, params));
 		try {
 			if (!json.has("error")) {
@@ -593,7 +599,91 @@ public final class OAuth2 {
 			return null;
 		}
 	}
-	
+
+	public final Response requestDeviation(String deviationUUID) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (deviationUUID == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.DEVIATION + deviationUUID, params));
+		try {
+			if (!json.has("error")) {
+				return new RespDeviation(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestDeviationContent(String deviationUUID) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (deviationUUID == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		params.put("deviationid", deviationUUID);
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.DEVIATION_CONTENT, params));
+		try {
+			if (!json.has("error")) {
+				return new RespDeviationContent(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public final Response requestStashPublishCategorytree() {
+		return requestStashPublishCategorytree("/");
+	}
+	public final Response requestStashPublishCategorytree(String categoryPath) {
+		return requestStashPublishCategorytree(categoryPath, null);
+	}
+	public final Response requestStashPublishCategorytree(String categoryPath, String fileType) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.STASH, Scope.PUBLISH);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		if (categoryPath == null) {
+			categoryPath = "/";
+		}
+		params.put("catpath", categoryPath);
+		if (fileType != null) {
+			params.put("filetype", fileType);
+		}
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.STASH_PUBLISH_CATEGORYTREE, params));
+		try {
+			if (!json.has("error")) {
+				return new RespCategory(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 	public final Response requestStashPublishUserdata() {
 		Response respVerify = verifyScopesAndAuth(Scope.STASH, Scope.PUBLISH);
 		if (respVerify.isError()) {

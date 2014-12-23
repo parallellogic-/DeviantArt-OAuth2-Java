@@ -39,7 +39,6 @@ public final class Endpoints_v1 extends Endpoints {
 	public final static String DEVIATION_EMBEDDED = 		DEVIATION + "embeddedcontent";
 	public final static String DEVIATION_METADATA = 		DEVIATION + "metadata";
 	public final static String DEVIATION_WHOFAVED = 		DEVIATION + "whofaved";
-	public final static String DEVIATION_ = 				DEVIATION + "";
 	
 	private final static String PREFIX_FEED = 				PREFIX_ENDPOINT + "feed/";
 	public final static String FEED_HOME = 					PREFIX_FEED + "home";
