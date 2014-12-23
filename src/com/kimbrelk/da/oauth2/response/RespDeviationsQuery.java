@@ -4,6 +4,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public final class RespDeviationsQuery extends RespDeviations {
+	public final static int ERROR_INVALID_PRINT = 0;
+	
 	private boolean mHasMore;
 	private int mNextOffset;
 	

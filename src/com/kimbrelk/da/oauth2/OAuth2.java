@@ -1,5 +1,6 @@
 package com.kimbrelk.da.oauth2;
 
+import com.kimbrelk.da.oauth2.response.RespBrowseMorelikethisPreview;
 import com.kimbrelk.da.oauth2.response.RespDeviations;
 import com.kimbrelk.da.oauth2.response.RespDeviationsQuery;
 import com.kimbrelk.da.oauth2.response.RespError;
@@ -288,6 +289,71 @@ public final class OAuth2 {
 			return null;
 		}
 	}
+	public final Response requestBrowseMorelikethis(String deviationUUID) {
+		return requestBrowseMorelikethis(deviationUUID, null);
+	}
+	public final Response requestBrowseMorelikethis(String deviationUUID, String categoryPath) {
+		return requestBrowseMorelikethis(deviationUUID, categoryPath, -1, -1);
+	}
+	public final Response requestBrowseMorelikethis(String deviationUUID, String categoryPath, int offset, int limit) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE, Scope.BROWSE_MLT);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		if (deviationUUID == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		params.put("seed", deviationUUID);
+		if (categoryPath != null) {
+			params.put("category_path", categoryPath);
+		}
+		if (offset != -1) {
+			params.put("offset", offset + "");
+		}
+		if (limit != -1) {
+			params.put("limit", limit + "");
+		}
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.BROWSE_MORELIKETHIS, params));
+		try {
+			if (!json.has("error")) {
+				return new RespDeviationsQuery(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestBrowseMorelikethisPreview(String deviationUUID) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE, Scope.BROWSE_MLT);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		if (deviationUUID == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		params.put("seed", deviationUUID);
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.BROWSE_MORELIKETHIS_PREV, params));
+		try {
+			if (!json.has("error")) {
+				return new RespBrowseMorelikethisPreview(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 	public final Response requestBrowseNewest() {
 		return requestBrowseNewest(null, null, -1, -1);
 	}
@@ -330,7 +396,7 @@ public final class OAuth2 {
 	public final Response requestBrowsePopular() {
 		return requestBrowsePopular(null, null, -1, -1, null);
 	}
-	public final Response requestBrowsePopular(String categoryPath, String query,String timeRange) {
+	public final Response requestBrowsePopular(String categoryPath, String query, String timeRange) {
 		return requestBrowsePopular(categoryPath, query, -1, -1, timeRange);
 	}
 	public final Response requestBrowsePopular(String categoryPath, String query, int offset, int limit, String timeRange) {
@@ -356,6 +422,76 @@ public final class OAuth2 {
 			params.put("timerange", timeRange);
 		}
 		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.BROWSE_POPULAR, params));
+		try {
+			if (!json.has("error")) {
+				return new RespDeviationsQuery(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestBrowseTags(String tag) {
+		return requestBrowseTags(tag, -1, -1);
+	}
+	public final Response requestBrowseTags(String tag, int offset, int limit) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		if (tag == null) {
+			return RespError.REQUEST_FAILED;
+		}
+		params.put("tag", tag);
+		if (offset != -1) {
+			params.put("offset", offset + "");
+		}
+		if (limit != -1) {
+			params.put("limit", limit + "");
+		}
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.BROWSE_TAGS, params));
+		try {
+			if (!json.has("error")) {
+				return new RespDeviationsQuery(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestBrowseUndiscovered() {
+		return requestBrowseUndiscovered(null);
+	}
+	public final Response requestBrowseUndiscovered(String categoryPath) {
+		return requestBrowseUndiscovered(categoryPath, -1, -1);
+	}
+	public final Response requestBrowseUndiscovered(String categoryPath, int offset, int limit) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		if (categoryPath != null) {
+			params.put("category_path", categoryPath);
+		}
+		if (offset != -1) {
+			params.put("offset", offset + "");
+		}
+		if (limit != -1) {
+			params.put("limit", limit + "");
+		}
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.BROWSE_UNDISCOVERED, params));
 		try {
 			if (!json.has("error")) {
 				return new RespDeviationsQuery(json);

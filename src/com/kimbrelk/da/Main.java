@@ -3,6 +3,7 @@ package com.kimbrelk.da;
 import com.kimbrelk.da.oauth2.OAuth2;
 import com.kimbrelk.da.oauth2.Scope;
 import com.kimbrelk.da.oauth2.AuthGrantType;
+import com.kimbrelk.da.oauth2.response.RespBrowseMorelikethisPreview;
 import com.kimbrelk.da.oauth2.response.RespDeviations;
 import com.kimbrelk.da.oauth2.response.RespDeviationsQuery;
 import com.kimbrelk.da.oauth2.response.RespError;
@@ -15,7 +16,6 @@ import com.kimbrelk.da.oauth2.response.Response;
 import com.kimbrelk.da.oauth2.struct.ArtistLevel;
 import com.kimbrelk.da.oauth2.struct.ArtistSpeciality;
 import com.kimbrelk.da.oauth2.struct.TimeRange;
-
 import java.util.Scanner;
 
 public final class Main {
@@ -60,14 +60,18 @@ public final class Main {
 			
 			// Auth Demos
 			demoAuthGetTokens(oAuth2);
-			//demoAuthRevoke(oAuth2);
+			//demoAuthRevoke(oAuth2);	// /revoke is broken on dA's side at this time.
 			
 			// Browse Demos
 			// TODO
-			demoBrowseDailydeviations(oAuth2);
-			demoBrowseHot(oAuth2);
-			demoBrowseNewest(oAuth2);
-			demoBrowsePopular(oAuth2);
+			//demoBrowseDailydeviations(oAuth2);
+			//demoBrowseHot(oAuth2);
+			//demoBrowseMorelikethis(oAuth2);
+			//demoBrowseMorelikethisPreview(oAuth2);
+			//demoBrowseNewest(oAuth2);
+			//demoBrowsePopular(oAuth2);
+			//demoBrowseTags(oAuth2);
+			//demoBrowseUndiscovered(oAuth2);
 			
 			// Collections Demos
 			// TODO
@@ -89,18 +93,18 @@ public final class Main {
 			
 			// Sta.sh Demos
 			// TODO
-			demoStashPublishUserdata(oAuth2);
-			demoStashSpace(oAuth2);
+			//demoStashPublishUserdata(oAuth2);
+			//demoStashSpace(oAuth2);
 			
 			// User Demos
 			// TODO
-			demoUserDamntoken(oAuth2);
+			//demoUserDamntoken(oAuth2);
 			//demoUserProfileUpdate(oAuth2);
-			demoUserWhoami(oAuth2);
-			demoUserWhois(oAuth2, "baronbeandip");
+			//demoUserWhoami(oAuth2);
+			//demoUserWhois(oAuth2, "baronbeandip");
 			
 			// Util Demos
-			demoUtilPlacebo(oAuth2);
+			//demoUtilPlacebo(oAuth2);
 		}
 		
 		in.close();
@@ -134,7 +138,6 @@ public final class Main {
 				((RespDeviations)resp).getDeviations()[0].getTitle() + "\"");
 		}
 		else {
-			System.out.println("Auth Revoke Failed:");
 			System.out.println(resp);
 		}
 		System.out.println();
@@ -147,7 +150,30 @@ public final class Main {
 				((RespDeviationsQuery)resp).getDeviations()[0].getTitle() + "\"");
 		}
 		else {
-			System.out.println("Auth Revoke Failed:");
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoBrowseMorelikethis(OAuth2 oAuth2) {
+		System.out.println("demoBrowseMorelikethis()");
+		Response resp = oAuth2.requestBrowseMorelikethis("AA4C62ED-1020-3DDA-66BE-C3DD17C52CA2");
+		if (resp.isSuccess()) {
+			System.out.println("First deviation that is like \'Hair Step by step Winter edition tutorial\': \"" + 
+				((RespDeviationsQuery)resp).getDeviations()[0].getTitle() + "\"");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoBrowseMorelikethisPreview(OAuth2 oAuth2) {
+		System.out.println("demoBrowseMorelikethisPreview()");
+		Response resp = oAuth2.requestBrowseMorelikethisPreview("AA4C62ED-1020-3DDA-66BE-C3DD17C52CA2");
+		if (resp.isSuccess()) {
+			System.out.println("First deviation by different user similar to \'Hair Step by step Winter edition tutorial\': \"" + 
+				((RespBrowseMorelikethisPreview)resp).getMoreFromDeviantArt()[0].getTitle() + "\"");
+		}
+		else {
 			System.out.println(resp);
 		}
 		System.out.println();
@@ -160,7 +186,6 @@ public final class Main {
 				((RespDeviationsQuery)resp).getDeviations()[0].getTitle() + "\"");
 		}
 		else {
-			System.out.println("Auth Revoke Failed:");
 			System.out.println(resp);
 		}
 		System.out.println();
@@ -170,6 +195,30 @@ public final class Main {
 		Response resp = oAuth2.requestBrowsePopular(null, "java", -1, -1, TimeRange.ALLTIME);
 		if (resp.isSuccess()) {
 			System.out.println("Title most popular \'java\' deviation of all time: \"" + 
+				((RespDeviationsQuery)resp).getDeviations()[0].getTitle() + "\"");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoBrowseTags(OAuth2 oAuth2) {
+		System.out.println("demoBrowseTags()");
+		Response resp = oAuth2.requestBrowseTags("android");
+		if (resp.isSuccess()) {
+			System.out.println("Title of first \'android\' tagged deviation: \"" + 
+				((RespDeviationsQuery)resp).getDeviations()[0].getTitle() + "\"");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoBrowseUndiscovered(OAuth2 oAuth2) {
+		System.out.println("demoBrowseUndiscovered()");
+		Response resp = oAuth2.requestBrowseUndiscovered();
+		if (resp.isSuccess()) {
+			System.out.println("Title of first undiscovered deviation: \"" + 
 				((RespDeviationsQuery)resp).getDeviations()[0].getTitle() + "\"");
 		}
 		else {
