@@ -2,6 +2,7 @@ package com.kimbrelk.da.oauth2;
 
 import com.kimbrelk.da.oauth2.response.RespBrowseMorelikethisPreview;
 import com.kimbrelk.da.oauth2.response.RespBrowseTagsSearch;
+import com.kimbrelk.da.oauth2.response.RespCategory;
 import com.kimbrelk.da.oauth2.response.RespDeviations;
 import com.kimbrelk.da.oauth2.response.RespDeviationsQuery;
 import com.kimbrelk.da.oauth2.response.RespError;
@@ -220,7 +221,31 @@ public final class OAuth2 {
 		}
 		return response;
 	}
-
+	
+	public final Response requestBrowseCategorytree(String categoryPath) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		if (categoryPath != null) {
+			params.put("catpath", categoryPath);
+		}
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.BROWSE_CATEGORYTREE, params));
+		try {
+			if (!json.has("error")) {
+				return new RespCategory(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 	public final Response requestBrowseDailydeviations(int year, int month, int day) {
 		Calendar c = Calendar.getInstance();
 		c.set(year, month-1, day);

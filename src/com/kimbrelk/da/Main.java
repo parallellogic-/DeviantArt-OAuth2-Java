@@ -5,6 +5,7 @@ import com.kimbrelk.da.oauth2.Scope;
 import com.kimbrelk.da.oauth2.AuthGrantType;
 import com.kimbrelk.da.oauth2.response.RespBrowseMorelikethisPreview;
 import com.kimbrelk.da.oauth2.response.RespBrowseTagsSearch;
+import com.kimbrelk.da.oauth2.response.RespCategory;
 import com.kimbrelk.da.oauth2.response.RespDeviations;
 import com.kimbrelk.da.oauth2.response.RespDeviationsQuery;
 import com.kimbrelk.da.oauth2.response.RespError;
@@ -64,7 +65,7 @@ public final class Main {
 			//demoAuthRevoke(oAuth2);	// /revoke is broken on dA's side at this time.
 			
 			// Browse Demos
-			// TODO
+			//demoBrowseCategorytree(oAuth2);
 			//demoBrowseDailydeviations(oAuth2);
 			//demoBrowseHot(oAuth2);
 			//demoBrowseMorelikethis(oAuth2);
@@ -133,6 +134,18 @@ public final class Main {
 		System.out.println();
 	}
 	
+	private final static void demoBrowseCategorytree(OAuth2 oAuth2) {
+		System.out.println("demoBrowseCategorytree()");
+		Response resp = oAuth2.requestBrowseCategorytree("/flash/");
+		if (resp.isSuccess()) {
+			System.out.println("First category in \'/flash/\': \"" + 
+				((RespCategory)resp).getCategories()[0].getTitle() + "\"");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
 	private final static void demoBrowseDailydeviations(OAuth2 oAuth2) {
 		System.out.println("demoBrowseDailydeviations()");
 		Response resp = oAuth2.requestBrowseDailydeviations("2001-12-25");
