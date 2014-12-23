@@ -505,6 +505,44 @@ public final class OAuth2 {
 			return null;
 		}
 	}
+	public final Response requestBrowseUserJournals(String userName) {
+		return requestBrowseUserJournals(userName, true);
+	}
+	public final Response requestBrowseUserJournals(String userName, boolean featuredOnly) {
+		return requestBrowseUserJournals(userName, featuredOnly, -1, -1);
+	}
+	public final Response requestBrowseUserJournals(String userName, boolean featuredOnly, int offset, int limit) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		if (userName == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		params.put("username", userName);
+		params.put("featured", featuredOnly + "");
+		if (offset != -1) {
+			params.put("offset", offset + "");
+		}
+		if (limit != -1) {
+			params.put("limit", limit + "");
+		}
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.BROWSE_USER_JOURNALS, params));
+		try {
+			if (!json.has("error")) {
+				return new RespDeviationsQuery(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 	
 	public final Response requestStashPublishUserdata() {
 		Response respVerify = verifyScopesAndAuth(Scope.STASH, Scope.PUBLISH);

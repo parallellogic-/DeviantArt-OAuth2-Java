@@ -72,6 +72,7 @@ public final class Main {
 			//demoBrowsePopular(oAuth2);
 			//demoBrowseTags(oAuth2);
 			//demoBrowseUndiscovered(oAuth2);
+			demoBrowseUserJournals(oAuth2);
 			
 			// Collections Demos
 			// TODO
@@ -222,7 +223,18 @@ public final class Main {
 				((RespDeviationsQuery)resp).getDeviations()[0].getTitle() + "\"");
 		}
 		else {
-			System.out.println("Auth Revoke Failed:");
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoBrowseUserJournals(OAuth2 oAuth2) {
+		System.out.println("demoBrowseUserJournals()");
+		Response resp = oAuth2.requestBrowseUserJournals("baronbeandip");
+		if (resp.isSuccess()) {
+			System.out.println("Title of baronbeandip's newest featured journal: \"" + 
+				((RespDeviationsQuery)resp).getDeviations()[0].getTitle() + "\"");
+		}
+		else {
 			System.out.println(resp);
 		}
 		System.out.println();
