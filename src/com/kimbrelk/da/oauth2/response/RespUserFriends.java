@@ -5,7 +5,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public final class RespUserFriends extends RespPagination<Friend> {
+public final class RespUserFriends extends RespOffsetPagination<Friend> {
 	public RespUserFriends(JSONObject json) throws JSONException {
 		super(json);
 	}

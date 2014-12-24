@@ -1,6 +1,7 @@
 package com.kimbrelk.da.oauth2.response;
 
 import com.kimbrelk.da.oauth2.struct.Deviation;
+import com.kimbrelk.da.oauth2.struct.SimpleFolder;
 import com.kimbrelk.da.oauth2.struct.Status;
 import com.kimbrelk.da.oauth2.struct.User;
 import org.json.JSONArray;
@@ -11,11 +12,11 @@ public final class RespUserProfile extends Response {
 	private String mArtistLevel;
 	private String mArtistSpecialty;
 	private String mBio;
-	private Folder[] mCollections;
+	private SimpleFolder[] mCollections;
 	private String mCountry;
 	private int mCountryId;
 	private String mCoverPhoto;
-	private Folder[] mGalleries;
+	private SimpleFolder[] mGalleries;
 	private boolean mIsArtist;
 	private boolean mIsWatching;
 	private Status mLastStatus;
@@ -34,9 +35,9 @@ public final class RespUserProfile extends Response {
 		mBio = json.getString("bio");
 		if (json.has("collections")) {
 			JSONArray jsonCollections = json.getJSONArray("collections");
-			mCollections = new Folder[jsonCollections.length()];
+			mCollections = new SimpleFolder[jsonCollections.length()];
 			for(int a=0; a<mCollections.length; a++) {
-				mCollections[a] = new Folder(jsonCollections.getJSONObject(a));
+				mCollections[a] = new SimpleFolder(jsonCollections.getJSONObject(a));
 			}
 		}
 		mCountry = json.getString("country");
@@ -44,9 +45,9 @@ public final class RespUserProfile extends Response {
 		mCoverPhoto = json.optString("cover_photo");
 		if (json.has("galleries")) {
 			JSONArray jsonGalleries = json.getJSONArray("galleries");
-			mGalleries = new Folder[jsonGalleries.length()];
+			mGalleries = new SimpleFolder[jsonGalleries.length()];
 			for(int a=0; a<mGalleries.length; a++) {
-				mGalleries[a] = new Folder(jsonGalleries.getJSONObject(a));
+				mGalleries[a] = new SimpleFolder(jsonGalleries.getJSONObject(a));
 			}
 		}
 		mIsArtist = json.getBoolean("user_is_artist");
@@ -70,7 +71,7 @@ public final class RespUserProfile extends Response {
 	public final String getBio() {
 		return mBio;
 	}
-	public final Folder[] getCollections() {
+	public final SimpleFolder[] getCollections() {
 		return mCollections;
 	}
 	public final String getCountry() {
@@ -82,7 +83,7 @@ public final class RespUserProfile extends Response {
 	public final String getCoverPhoto() {
 		return mCoverPhoto;
 	}
-	public final Folder[] getGalleries() {
+	public final SimpleFolder[] getGalleries() {
 		return mGalleries;
 	}
 	public final Status getLastStatus() {
@@ -117,29 +118,6 @@ public final class RespUserProfile extends Response {
 		return mIsWatching;
 	}
 	
-	public final class Folder {
-		private String mId;
-		private String mName;
-		private String mParentId;
-		
-		public Folder(JSONObject json) throws JSONException {
-			mId = json.getString("folderid");
-			mName = json.getString("name");
-			if (json.has("parent")) {
-				mParentId = json.optString("parent");
-			}
-		}
-
-		public final String getId() {
-			return mId;
-		}
-		public final String getName() {
-			return mName;
-		}
-		public final String getParentId() {
-			return mParentId;
-		}
-	}
 	public final class Stats {
 		private int mNumProfilePageviews;
 		private int mNumProfileComments;

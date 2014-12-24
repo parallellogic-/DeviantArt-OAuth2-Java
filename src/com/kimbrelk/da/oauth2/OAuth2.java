@@ -3,12 +3,15 @@ package com.kimbrelk.da.oauth2;
 import com.kimbrelk.da.oauth2.response.RespBrowseMorelikethisPreview;
 import com.kimbrelk.da.oauth2.response.RespBrowseTagsSearch;
 import com.kimbrelk.da.oauth2.response.RespCategory;
+import com.kimbrelk.da.oauth2.response.RespCurated;
 import com.kimbrelk.da.oauth2.response.RespCuratedTags;
 import com.kimbrelk.da.oauth2.response.RespDeviation;
 import com.kimbrelk.da.oauth2.response.RespDeviationContent;
 import com.kimbrelk.da.oauth2.response.RespDeviations;
 import com.kimbrelk.da.oauth2.response.RespDeviationsQuery;
 import com.kimbrelk.da.oauth2.response.RespError;
+import com.kimbrelk.da.oauth2.response.RespFeed;
+import com.kimbrelk.da.oauth2.response.RespFeedNotifications;
 import com.kimbrelk.da.oauth2.response.RespFriends;
 import com.kimbrelk.da.oauth2.response.RespGallery;
 import com.kimbrelk.da.oauth2.response.RespGalleryFolders;
@@ -614,6 +617,45 @@ public final class OAuth2 {
 		}
 	}
 
+	public final Response requestCurated() {
+		return requestCurated(0, null);
+	}
+	public final Response requestCurated(int offset) {
+		return requestCurated(offset, null);
+	}
+	public final Response requestCurated(String expansions) {
+		return requestCurated(0, expansions);
+	}
+	public final Response requestCurated(int offset, String expansions) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		if (offset != -1) {
+			params.put("offset", offset + "");
+		}
+		else {
+			params.put("offset", "0");
+		}
+		if (expansions != null) {
+			params.put("expand", expansions);
+		}
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.CURATED, params));
+		try {
+			if (!json.has("error")) {
+				return new RespCurated(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 	public final Response requestCuratedTags() {
 		return requestCuratedTags(false);
 	}
@@ -683,6 +725,95 @@ public final class OAuth2 {
 		try {
 			if (!json.has("error")) {
 				return new RespDeviationContent(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public final Response requestFeedHome() {
+		return requestFeedHome(null);
+	}
+	public final Response requestFeedHome(String cursor) {
+		return requestFeedHome(cursor, SHOW_MATURE_DEFAULT);
+	}
+	public final Response requestFeedHome(boolean showMatureContent) {
+		return requestFeedHome(null, showMatureContent);
+	}
+	public final Response requestFeedHome(String cursor, boolean showMatureContent) {
+		Response respVerify = verifyScopesAndAuth(Scope.FEED);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		if (cursor != null) {
+			params.put("cursor", cursor);
+		}
+		params.put("mature_content", showMatureContent + "");
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.FEED_HOME, params));
+		try {
+			if (!json.has("error")) {
+				return new RespFeed(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestFeedNotifications() {
+		return requestFeedNotifications(null);
+	}
+	public final Response requestFeedNotifications(String cursor) {
+		Response respVerify = verifyScopesAndAuth(Scope.FEED);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		if (cursor != null) {
+			params.put("cursor", cursor);
+		}
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.FEED_NOTIFICATIONS, params));
+		try {
+			if (!json.has("error")) {
+				return new RespFeedNotifications(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestFeedProfile() {
+		return requestFeedProfile(null);
+	}
+	public final Response requestFeedProfile(String cursor) {
+		Response respVerify = verifyScopesAndAuth(Scope.FEED);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		if (cursor != null) {
+			params.put("cursor", cursor);
+		}
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.FEED_PROFILE, params));
+		try {
+			if (!json.has("error")) {
+				return new RespFeed(json);
 			}
 			else {
 				return new RespError(json);

@@ -7,13 +7,11 @@ import org.json.JSONObject;
 public abstract class RespPagination<T> extends Response {
 	protected T[] mResults;
 	private boolean mHasMore;
-	private int mNextOffset;
 	
-	public RespPagination(JSONObject json) throws JSONException {
+	public RespPagination(JSONObject json, String arrayName) throws JSONException {
 		super();
-		getResultsFromJsonArray(json.getJSONArray("results"));
 		mHasMore = json.getBoolean("has_more");
-		mNextOffset = json.optInt("next_offset");
+		getResultsFromJsonArray(json.getJSONArray(arrayName));
 	}
 	
 	protected abstract void getResultsFromJsonArray(JSONArray json) throws JSONException;
@@ -23,8 +21,5 @@ public abstract class RespPagination<T> extends Response {
 	}
 	public final boolean hasMore() {
 		return mHasMore;
-	}
-	public final int nextOffset() {
-		return mNextOffset;
 	}
 }

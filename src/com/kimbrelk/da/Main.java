@@ -7,12 +7,15 @@ import com.kimbrelk.da.oauth2.AuthGrantType;
 import com.kimbrelk.da.oauth2.response.RespBrowseMorelikethisPreview;
 import com.kimbrelk.da.oauth2.response.RespBrowseTagsSearch;
 import com.kimbrelk.da.oauth2.response.RespCategory;
+import com.kimbrelk.da.oauth2.response.RespCurated;
 import com.kimbrelk.da.oauth2.response.RespCuratedTags;
 import com.kimbrelk.da.oauth2.response.RespDeviation;
 import com.kimbrelk.da.oauth2.response.RespDeviationContent;
 import com.kimbrelk.da.oauth2.response.RespDeviations;
 import com.kimbrelk.da.oauth2.response.RespDeviationsQuery;
 import com.kimbrelk.da.oauth2.response.RespError;
+import com.kimbrelk.da.oauth2.response.RespFeed;
+import com.kimbrelk.da.oauth2.response.RespFeedNotifications;
 import com.kimbrelk.da.oauth2.response.RespFriends;
 import com.kimbrelk.da.oauth2.response.RespGallery;
 import com.kimbrelk.da.oauth2.response.RespGalleryFolders;
@@ -39,7 +42,7 @@ import java.util.Scanner;
 @SuppressWarnings("unused")
 public final class Main {
 	private final static ClientCredentials CREDENTIALS = new MyCredentials();
-	private final static AuthGrantType GRANT_TYPE = AuthGrantType.CLIENT_CREDENTIALS;
+	private final static AuthGrantType GRANT_TYPE = AuthGrantType.REFRESH_TOKEN;
 	private final static String URI_REDIRECT = "http://127.0.0.1/";
 	
 	public final static void main(String[] args) {
@@ -101,8 +104,8 @@ public final class Main {
 			// TODO
 			
 			// Curated Demos
-			// TODO
-			demoUserCuratedTags(oAuth2);
+			//demoCurated(oAuth2);
+			//demoCuratedTags(oAuth2);
 			
 			// Deviation Demos
 			// TODO
@@ -110,7 +113,9 @@ public final class Main {
 			//demoDeviationContent(oAuth2);
 			
 			// Feed Demos
-			// TODO
+			//demoFeedHome(oAuth2);
+			demoFeedNotifications(oAuth2);
+			//demoFeedProfile(oAuth2);
 			
 			// Gallery Demos
 			//demoGallery(oAuth2);
@@ -297,9 +302,21 @@ public final class Main {
 		}
 		System.out.println();
 	}
-	
-	private final static void demoUserCuratedTags(OAuth2 oAuth2) {
-		System.out.println("demoUserCuratedTags()");
+
+	private final static void demoCurated(OAuth2 oAuth2) {
+		System.out.println("demoCurated()");
+		Response resp;
+		resp = oAuth2.requestCurated(0);
+		if (resp.isSuccess()) {
+			System.out.println("The first curated headline: \"" + ((RespCurated)resp).getResults()[0].getHeadline() + "\".");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoCuratedTags(OAuth2 oAuth2) {
+		System.out.println("demoCuratedTags()");
 		Response resp;
 		resp = oAuth2.requestCuratedTags();
 		if (resp.isSuccess()) {
@@ -335,7 +352,49 @@ public final class Main {
 		}
 		System.out.println();
 	}
-
+	
+	private final static void demoFeedHome(OAuth2 oAuth2) {
+		System.out.println("demoFeedHome()");
+		Response resp;
+		resp = oAuth2.requestFeedHome();
+		if (resp.isSuccess()) {
+			System.out.println("The first home feed item: \"" + ((RespFeed)resp).getResults()[0].getType() + " by " + ((RespFeed)resp).getResults()[0].byUser().getName() + "\".");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoFeedNotifications(OAuth2 oAuth2) {
+		System.out.println("demoFeedNotifications()");
+		Response resp;
+		resp = oAuth2.requestFeedNotifications();
+		if (resp.isSuccess()) {
+			if (((RespFeedNotifications)resp).getResults().length > 0) {
+				System.out.println("The first notifications feed item: \"" + ((RespFeedNotifications)resp).getResults()[0].getType() + " by " + ((RespFeedNotifications)resp).getResults()[0].byUser().getName() + "\".");
+			}
+			else {
+				System.out.println("Your notification feed is empty.");
+			}
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoFeedProfile(OAuth2 oAuth2) {
+		System.out.println("demoFeedProfile()");
+		Response resp;
+		resp = oAuth2.requestFeedProfile();
+		if (resp.isSuccess()) {
+			System.out.println("The first profile feed item: \"" + ((RespFeed)resp).getResults()[0].getType() + " by " + ((RespFeed)resp).getResults()[0].byUser().getName() + "\".");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	
 	private final static void demoGallery(OAuth2 oAuth2) {
 		System.out.println("demoGallery()");
 		Response resp = oAuth2.requestGallery("baronbeandip", "181CADE2-DB26-A091-0118-6516A45BCF3C", GalleryMode.NEWEST);
