@@ -17,6 +17,7 @@ import com.kimbrelk.da.oauth2.response.RespToken;
 import com.kimbrelk.da.oauth2.response.RespUserDamntoken;
 import com.kimbrelk.da.oauth2.response.RespUserFriends;
 import com.kimbrelk.da.oauth2.response.RespUserFriendsWatching;
+import com.kimbrelk.da.oauth2.response.RespUserProfile;
 import com.kimbrelk.da.oauth2.response.RespUserStatus;
 import com.kimbrelk.da.oauth2.response.RespUserStatuses;
 import com.kimbrelk.da.oauth2.response.RespUserStatusPost;
@@ -980,6 +981,41 @@ public final class OAuth2 {
 		try {
 			if (!json.has("error")) {
 				return new RespUserFriendsWatching(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestUserProfile(String userName) {
+		return requestUserProfile(userName, null);
+	}
+	public final Response requestUserProfile(String userName, String expansions) {
+		return requestUserProfile(userName, expansions, false, false);
+	}
+	public final Response requestUserProfile(String userName, String expansions, boolean getCollections, boolean getGalleries) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (userName == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		if (expansions != null) {
+			params.put("expand", expansions);
+		}
+		params.put("ext_collections", getCollections + "");
+		params.put("ext_galleries", getGalleries + "");
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.USER_PROFILE + userName, params));
+		try {
+			if (!json.has("error")) {
+				return new RespUserProfile(json);
 			}
 			else {
 				return new RespError(json);

@@ -20,6 +20,7 @@ import com.kimbrelk.da.oauth2.response.RespStashSpace;
 import com.kimbrelk.da.oauth2.response.RespUserDamntoken;
 import com.kimbrelk.da.oauth2.response.RespUserFriends;
 import com.kimbrelk.da.oauth2.response.RespUserFriendsWatching;
+import com.kimbrelk.da.oauth2.response.RespUserProfile;
 import com.kimbrelk.da.oauth2.response.RespUserStatus;
 import com.kimbrelk.da.oauth2.response.RespUserStatuses;
 import com.kimbrelk.da.oauth2.response.RespUserWatchers;
@@ -122,16 +123,17 @@ public final class Main {
 			// User Demos
 			// TODO
 			//demoUserDamntoken(oAuth2);
-			demoUserFriends(oAuth2);
-			demoUserFriendsSearch(oAuth2);
+			//demoUserFriends(oAuth2);
+			//demoUserFriendsSearch(oAuth2);
 			//demoUserFriendsUnwatch(oAuth2);
 			//demoUserFriendsWatch(oAuth2);
-			demoUserFriendsWatching(oAuth2);
+			//demoUserFriendsWatching(oAuth2);
+			//demoUserProfile(oAuth2);
 			//demoUserProfileUpdate(oAuth2);
-			demoUserStatus(oAuth2);
+			//demoUserStatus(oAuth2);
 			//demoUserStatusPost(oAuth2);
-			demoUserStatuses(oAuth2);
-			demoUserWatchers(oAuth2);
+			//demoUserStatuses(oAuth2);
+			//demoUserWatchers(oAuth2);
 			//demoUserWhoami(oAuth2);
 			//demoUserWhois(oAuth2);
 			
@@ -456,6 +458,18 @@ public final class Main {
 			else {
 				System.out.println("You are not watching Pickley.");
 			}
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoUserProfile(OAuth2 oAuth2) {
+		System.out.println("demoUserProfile()");
+		Response resp;
+		resp = oAuth2.requestUserProfile("baronbeandip");
+		if (resp.isSuccess()) {
+			System.out.println("baronbeandip's has " + ((RespUserProfile)resp).getStats().getProfileViews() + " profile views.");
 		}
 		else {
 			System.out.println(resp);
