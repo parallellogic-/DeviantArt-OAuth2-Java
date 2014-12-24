@@ -13,6 +13,18 @@ public final class Watch {
 	private boolean mJournals;
 	private boolean mScraps;
 	
+	public Watch(boolean activity, boolean collections, boolean critiques, 
+			boolean deviations, boolean forums, boolean isFriend, 
+			boolean journals, boolean scraps) {
+		mActivity = activity;
+		mCollections = collections;
+		mCritiques = critiques;
+		mDeviations = deviations;
+		mForums = forums;
+		mIsFriend = isFriend;
+		mJournals = journals;
+		mScraps = scraps;
+	}
 	public Watch(JSONObject json) throws JSONException {
 		mActivity = json.getBoolean("activity");
 		mCollections = json.getBoolean("collections");
@@ -22,6 +34,19 @@ public final class Watch {
 		mIsFriend = json.getBoolean("friend");
 		mJournals = json.getBoolean("journals");
 		mScraps = json.getBoolean("scraps");
+	}
+	
+	public final String parameterize() {
+		String ret = "";
+		ret += "watch[activity]=" + mActivity + "&";
+		ret += "watch[collections]=" + mCollections + "&";
+		ret += "watch[critiques]=" + mCritiques + "&";
+		ret += "watch[deviations]=" + mDeviations + "&";
+		ret += "watch[forum_threads]=" + mForums + "&";
+		ret += "watch[friend]=" + mIsFriend + "&";
+		ret += "watch[journals]=" + mJournals + "&";
+		ret += "watch[scraps]=" + mScraps;
+		return ret;
 	}
 	
 	public final boolean activity() {

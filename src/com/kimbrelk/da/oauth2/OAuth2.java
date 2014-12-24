@@ -8,17 +8,20 @@ import com.kimbrelk.da.oauth2.response.RespDeviationContent;
 import com.kimbrelk.da.oauth2.response.RespDeviations;
 import com.kimbrelk.da.oauth2.response.RespDeviationsQuery;
 import com.kimbrelk.da.oauth2.response.RespError;
+import com.kimbrelk.da.oauth2.response.RespFriends;
 import com.kimbrelk.da.oauth2.response.RespGallery;
 import com.kimbrelk.da.oauth2.response.RespGalleryFolders;
 import com.kimbrelk.da.oauth2.response.RespStashPublishUserdata;
 import com.kimbrelk.da.oauth2.response.RespStashSpace;
 import com.kimbrelk.da.oauth2.response.RespToken;
 import com.kimbrelk.da.oauth2.response.RespUserDamntoken;
+import com.kimbrelk.da.oauth2.response.RespUserFriendsWatching;
 import com.kimbrelk.da.oauth2.response.RespUserWhoami;
 import com.kimbrelk.da.oauth2.response.RespUserWhois;
 import com.kimbrelk.da.oauth2.response.Response;
 import com.kimbrelk.da.oauth2.struct.GalleryMode;
 import com.kimbrelk.da.oauth2.struct.User;
+import com.kimbrelk.da.oauth2.struct.Watch;
 import com.kimbrelk.da.oauth2.struct.Whois;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -839,18 +842,110 @@ public final class OAuth2 {
 			return null;
 		}
 	}
-	/**
-	 * Update the authorized user's profile
-	 * @param userIsArtist -1(ignore), 0(false), 1(true)
-	 * @param artistLevel See ArtistLevel, may be -1 to ignore
-	 * @param artistSpecialty See ArtistSpecialty, may be -1 to ignore
-	 * @param realName May be null to ignore
-	 * @param tagline May be null to ignore
-	 * @param countryid See /user/profile/update dev docs for values, may be -1 to ignore
-	 * @param website May be null to ignore
-	 * @param bio May be null to ignore
-	 * @return Response from dA
-	 */
+	public final Response requestUserFriendsSearch(String query) {
+		return requestUserFriendsSearch(null, query);
+	}
+	public final Response requestUserFriendsSearch(String userName, String query) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (userName == null && mToken.getRefreshToken() == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		if (query == null || query.length() == 0) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		params.put("username", userName);
+		params.put("query", query);
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.USER_FRIENDS_SEARCH, params));
+		try {
+			if (!json.has("error")) {
+				return new RespFriends(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestUserFriendsUnwatch(String userName) {
+		Response respVerify = verifyScopesAndAuth(Scope.BROWSE, Scope.USER_MANAGE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (userName == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.USER_FRIENDS_UNWATCH + userName, params));
+		try {
+			if (!json.has("error")) {
+				return new Response();
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestUserFriendsWatch(String userName, Watch watch) {
+		Response respVerify = verifyScopesAndAuth(Scope.BROWSE, Scope.USER_MANAGE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (userName == null || watch == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		JSONObject json = requestJSON(Verb.POST, createURL(ENDPOINTS.USER_FRIENDS_WATCH + userName, params), watch.parameterize());
+		try {
+			if (!json.has("error")) {
+				return new Response();
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestUserFriendsWatching(String userName) {
+		Response respVerify = verifyScopesAndAuth(Scope.BROWSE, Scope.USER);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (userName == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.USER_FRIENDS_WATCHING + userName, params));
+		try {
+			if (!json.has("error")) {
+				return new RespUserFriendsWatching(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 	public final Response requestUserProfileUpdate(int userIsArtist, int artistLevel, 
 			int artistSpecialty, String realName, String tagline, int countryid, String website, 
 			String bio) {

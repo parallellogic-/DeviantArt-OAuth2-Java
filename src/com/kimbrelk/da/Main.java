@@ -12,11 +12,13 @@ import com.kimbrelk.da.oauth2.response.RespDeviationContent;
 import com.kimbrelk.da.oauth2.response.RespDeviations;
 import com.kimbrelk.da.oauth2.response.RespDeviationsQuery;
 import com.kimbrelk.da.oauth2.response.RespError;
+import com.kimbrelk.da.oauth2.response.RespFriends;
 import com.kimbrelk.da.oauth2.response.RespGallery;
 import com.kimbrelk.da.oauth2.response.RespGalleryFolders;
 import com.kimbrelk.da.oauth2.response.RespStashPublishUserdata;
 import com.kimbrelk.da.oauth2.response.RespStashSpace;
 import com.kimbrelk.da.oauth2.response.RespUserDamntoken;
+import com.kimbrelk.da.oauth2.response.RespUserFriendsWatching;
 import com.kimbrelk.da.oauth2.response.RespUserWhoami;
 import com.kimbrelk.da.oauth2.response.RespUserWhois;
 import com.kimbrelk.da.oauth2.response.Response;
@@ -24,12 +26,14 @@ import com.kimbrelk.da.oauth2.struct.ArtistLevel;
 import com.kimbrelk.da.oauth2.struct.ArtistSpeciality;
 import com.kimbrelk.da.oauth2.struct.GalleryMode;
 import com.kimbrelk.da.oauth2.struct.TimeRange;
+import com.kimbrelk.da.oauth2.struct.Watch;
+
 import java.util.Scanner;
 
 @SuppressWarnings("unused")
 public final class Main {
 	private final static ClientCredentials CREDENTIALS = new MyCredentials();
-	private final static AuthGrantType GRANT_TYPE = AuthGrantType.CLIENT_CREDENTIALS;
+	private final static AuthGrantType GRANT_TYPE = AuthGrantType.AUTHORIZATION_CODE;
 	private final static String URI_REDIRECT = "http://127.0.0.1/";
 	
 	public final static void main(String[] args) {
@@ -114,6 +118,10 @@ public final class Main {
 			// User Demos
 			// TODO
 			//demoUserDamntoken(oAuth2);
+			//demoUserFriendsSearch(oAuth2);
+			//demoUserFriendsUnwatch(oAuth2);
+			//demoUserFriendsWatch(oAuth2);
+			//demoUserFriendsWatching(oAuth2);
 			//demoUserProfileUpdate(oAuth2);
 			//demoUserWhoami(oAuth2);
 			//demoUserWhois(oAuth2);
@@ -376,6 +384,59 @@ public final class Main {
 		}
 		else {
 			System.out.println("Failed to get your dAmn token:");
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoUserFriendsSearch(OAuth2 oAuth2) {
+		System.out.println("demoUserFriendsSearch()");
+		Response resp;
+		resp = oAuth2.requestUserFriendsSearch("baronbeandip", "pic");
+		if (resp.isSuccess()) {
+			System.out.println("Name of baronbeandip's first friend close to \'pic\': \"" + ((RespFriends)resp).getFriends()[0].getName() + "\".");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoUserFriendsUnwatch(OAuth2 oAuth2) {
+		System.out.println("demoUserFriendsUnwatch()");
+		Response resp;
+		resp = oAuth2.requestUserFriendsUnwatch("Pickley");
+		if (resp.isSuccess()) {
+			System.out.println("You have unwatched Pickley.");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoUserFriendsWatch(OAuth2 oAuth2) {
+		System.out.println("demoUserFriendsWatch()");
+		Response resp;
+		resp = oAuth2.requestUserFriendsWatch("Pickley", new Watch(true, true, true, true, true, true, true, true));
+		if (resp.isSuccess()) {
+			System.out.println("Successfully watched Pickley.");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoUserFriendsWatching(OAuth2 oAuth2) {
+		System.out.println("demoUserFriendsWatching()");
+		Response resp;
+		resp = oAuth2.requestUserFriendsWatching("Pickley");
+		if (resp.isSuccess()) {
+			if (((RespUserFriendsWatching)resp).isWatching()) {
+				System.out.println("You are watching Pickley.");
+			}
+			else {
+				System.out.println("You are not watching Pickley.");
+			}
+		}
+		else {
 			System.out.println(resp);
 		}
 		System.out.println();
