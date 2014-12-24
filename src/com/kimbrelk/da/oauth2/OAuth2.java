@@ -8,6 +8,8 @@ import com.kimbrelk.da.oauth2.response.RespDeviationContent;
 import com.kimbrelk.da.oauth2.response.RespDeviations;
 import com.kimbrelk.da.oauth2.response.RespDeviationsQuery;
 import com.kimbrelk.da.oauth2.response.RespError;
+import com.kimbrelk.da.oauth2.response.RespGallery;
+import com.kimbrelk.da.oauth2.response.RespGalleryFolders;
 import com.kimbrelk.da.oauth2.response.RespStashPublishUserdata;
 import com.kimbrelk.da.oauth2.response.RespStashSpace;
 import com.kimbrelk.da.oauth2.response.RespToken;
@@ -15,6 +17,7 @@ import com.kimbrelk.da.oauth2.response.RespUserDamntoken;
 import com.kimbrelk.da.oauth2.response.RespUserWhoami;
 import com.kimbrelk.da.oauth2.response.RespUserWhois;
 import com.kimbrelk.da.oauth2.response.Response;
+import com.kimbrelk.da.oauth2.struct.GalleryMode;
 import com.kimbrelk.da.oauth2.struct.User;
 import com.kimbrelk.da.oauth2.struct.Whois;
 import java.io.BufferedReader;
@@ -42,6 +45,7 @@ import org.json.JSONObject;
 public final class OAuth2 {
 	private final static Version VERSION = new Version(1, 20141204);
 	private final static Endpoints_v1 ENDPOINTS = new Endpoints_v1();
+	private final static boolean SHOW_MATURE_DEFAULT = true;
 	
 	private RespToken mToken;
 	private ClientCredentials mClientCredentials;
@@ -650,6 +654,93 @@ public final class OAuth2 {
 		}
 	}
 
+	public final Response requestGallery(String folderId) {
+		return requestGallery(null, folderId);
+	}
+	public final Response requestGallery(String userName, String folderId) {
+		return requestGallery(userName, folderId, null);
+	}
+	public final Response requestGallery(String userName, String folderId, GalleryMode mode) {
+		return requestGallery(userName, folderId, mode, -1, -1);
+	}
+	public final Response requestGallery(String userName, String folderId, GalleryMode mode, int offset, int limit) {
+		return requestGallery(userName, folderId, mode, offset, limit, SHOW_MATURE_DEFAULT);
+	}
+	public final Response requestGallery(String userName, String folderId, GalleryMode mode, int offset, int limit, boolean showMatureContent) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (folderId == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		if (userName == null && mToken.getRefreshToken() == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		if (userName != null) {
+			params.put("username", userName);
+		}
+		if (mode != null) {
+			params.put("mode", mode.toString().toLowerCase());
+		}
+		if (offset != -1) {
+			params.put("offset", offset + "");
+		}
+		if (limit != -1) {
+			params.put("limit", limit + "");
+		}
+		params.put("mature_content", showMatureContent + "");
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.GALLERY + folderId, params));
+		try {
+			if (!json.has("error")) {
+				return new RespGallery(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestGalleryFolders() {
+		return requestGalleryFolders(null);
+	}
+	public final Response requestGalleryFolders(String userName) {
+		return requestGalleryFolders(userName, false, false, SHOW_MATURE_DEFAULT);
+	}
+	public final Response requestGalleryFolders(String userName, boolean calculateSize, boolean preloadDeviations, boolean showMatureContent) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (userName == null && mToken.getRefreshToken() == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		params.put("username", userName);
+		params.put("calculate_size", calculateSize + "");
+		params.put("ext_preload", preloadDeviations + "");
+		params.put("mature_content", showMatureContent + "");
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.GALLERY_FOLDERS, params));
+		try {
+			if (!json.has("error")) {
+				return new RespGalleryFolders(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 	public final Response requestStashPublishCategorytree() {
 		return requestStashPublishCategorytree("/");
 	}

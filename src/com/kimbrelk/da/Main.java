@@ -12,6 +12,8 @@ import com.kimbrelk.da.oauth2.response.RespDeviationContent;
 import com.kimbrelk.da.oauth2.response.RespDeviations;
 import com.kimbrelk.da.oauth2.response.RespDeviationsQuery;
 import com.kimbrelk.da.oauth2.response.RespError;
+import com.kimbrelk.da.oauth2.response.RespGallery;
+import com.kimbrelk.da.oauth2.response.RespGalleryFolders;
 import com.kimbrelk.da.oauth2.response.RespStashPublishUserdata;
 import com.kimbrelk.da.oauth2.response.RespStashSpace;
 import com.kimbrelk.da.oauth2.response.RespUserDamntoken;
@@ -20,9 +22,11 @@ import com.kimbrelk.da.oauth2.response.RespUserWhois;
 import com.kimbrelk.da.oauth2.response.Response;
 import com.kimbrelk.da.oauth2.struct.ArtistLevel;
 import com.kimbrelk.da.oauth2.struct.ArtistSpeciality;
+import com.kimbrelk.da.oauth2.struct.GalleryMode;
 import com.kimbrelk.da.oauth2.struct.TimeRange;
 import java.util.Scanner;
 
+@SuppressWarnings("unused")
 public final class Main {
 	private final static ClientCredentials CREDENTIALS = new MyCredentials();
 	private final static AuthGrantType GRANT_TYPE = AuthGrantType.CLIENT_CREDENTIALS;
@@ -98,7 +102,8 @@ public final class Main {
 			// TODO
 			
 			// Gallery Demos
-			// TODO
+			//demoGallery(oAuth2);
+			//demoGalleryFolder(oAuth2);
 			
 			// Sta.sh Demos
 			// TODO
@@ -291,6 +296,31 @@ public final class Main {
 		if (resp.isSuccess()) {
 			System.out.println("Deviation html: \"" + 
 				((RespDeviationContent)resp).getHTML() + "\"");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+
+	private final static void demoGallery(OAuth2 oAuth2) {
+		System.out.println("demoGallery()");
+		Response resp = oAuth2.requestGallery("baronbeandip", "181CADE2-DB26-A091-0118-6516A45BCF3C", GalleryMode.NEWEST);
+		if (resp.isSuccess()) {
+			System.out.println("Name of first deviation in baronbeandip's gallery folder \'Featured\': \"" + 
+				((RespGallery)resp).getDeviations()[0].getTitle() + "\"");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoGalleryFolder(OAuth2 oAuth2) {
+		System.out.println("demoGalleryFolder()");
+		Response resp = oAuth2.requestGalleryFolders("baronbeandip");
+		if (resp.isSuccess()) {
+			System.out.println("baronbeandip's first gallery folder name and id: \"" + 
+				((RespGalleryFolders)resp).getFolders()[0].getName() + " : " + ((RespGalleryFolders)resp).getFolders()[0].getId() + "\"");
 		}
 		else {
 			System.out.println(resp);
