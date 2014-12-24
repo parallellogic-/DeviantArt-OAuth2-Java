@@ -7,6 +7,7 @@ import com.kimbrelk.da.oauth2.AuthGrantType;
 import com.kimbrelk.da.oauth2.response.RespBrowseMorelikethisPreview;
 import com.kimbrelk.da.oauth2.response.RespBrowseTagsSearch;
 import com.kimbrelk.da.oauth2.response.RespCategory;
+import com.kimbrelk.da.oauth2.response.RespCuratedTags;
 import com.kimbrelk.da.oauth2.response.RespDeviation;
 import com.kimbrelk.da.oauth2.response.RespDeviationContent;
 import com.kimbrelk.da.oauth2.response.RespDeviations;
@@ -101,6 +102,7 @@ public final class Main {
 			
 			// Curated Demos
 			// TODO
+			demoUserCuratedTags(oAuth2);
 			
 			// Deviation Demos
 			// TODO
@@ -121,7 +123,6 @@ public final class Main {
 			//demoStashSpace(oAuth2);
 			
 			// User Demos
-			// TODO
 			//demoUserDamntoken(oAuth2);
 			//demoUserFriends(oAuth2);
 			//demoUserFriendsSearch(oAuth2);
@@ -297,6 +298,19 @@ public final class Main {
 		System.out.println();
 	}
 	
+	private final static void demoUserCuratedTags(OAuth2 oAuth2) {
+		System.out.println("demoUserCuratedTags()");
+		Response resp;
+		resp = oAuth2.requestCuratedTags();
+		if (resp.isSuccess()) {
+			System.out.println("The first curated tag is: \"" + ((RespCuratedTags)resp).getResults()[0].getName() + "\".");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	
 	private final static void demoDeviation(OAuth2 oAuth2) {
 		System.out.println("demoDeviation()");
 		Response resp = oAuth2.requestDeviation("AA4C62ED-1020-3DDA-66BE-C3DD17C52CA2");
@@ -394,7 +408,6 @@ public final class Main {
 			System.out.println("Your dAmn token is " + ((RespUserDamntoken)resp).getDamnToken() + ".");
 		}
 		else {
-			System.out.println("Failed to get your dAmn token:");
 			System.out.println(resp);
 		}
 		System.out.println();

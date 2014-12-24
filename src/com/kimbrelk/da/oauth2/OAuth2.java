@@ -3,6 +3,7 @@ package com.kimbrelk.da.oauth2;
 import com.kimbrelk.da.oauth2.response.RespBrowseMorelikethisPreview;
 import com.kimbrelk.da.oauth2.response.RespBrowseTagsSearch;
 import com.kimbrelk.da.oauth2.response.RespCategory;
+import com.kimbrelk.da.oauth2.response.RespCuratedTags;
 import com.kimbrelk.da.oauth2.response.RespDeviation;
 import com.kimbrelk.da.oauth2.response.RespDeviationContent;
 import com.kimbrelk.da.oauth2.response.RespDeviations;
@@ -613,6 +614,36 @@ public final class OAuth2 {
 		}
 	}
 
+	public final Response requestCuratedTags() {
+		return requestCuratedTags(false);
+	}
+	public final Response requestCuratedTags(boolean getDeviations) {
+		return requestCuratedTags(getDeviations, SHOW_MATURE_DEFAULT);
+	}
+	public final Response requestCuratedTags(boolean getDeviations, boolean showMatureContent) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		params.put("ext_preload", getDeviations + "");
+		params.put("mature_content", getDeviations + "");
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.CURATED_TAGS, params));
+		try {
+			if (!json.has("error")) {
+				return new RespCuratedTags(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 	public final Response requestDeviation(String deviationUUID) {
 		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
 		if (respVerify.isError()) {
@@ -662,7 +693,7 @@ public final class OAuth2 {
 			return null;
 		}
 	}
-
+	
 	public final Response requestGallery(String folderId) {
 		return requestGallery(null, folderId);
 	}
