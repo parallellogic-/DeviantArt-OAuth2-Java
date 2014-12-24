@@ -18,7 +18,11 @@ import com.kimbrelk.da.oauth2.response.RespGalleryFolders;
 import com.kimbrelk.da.oauth2.response.RespStashPublishUserdata;
 import com.kimbrelk.da.oauth2.response.RespStashSpace;
 import com.kimbrelk.da.oauth2.response.RespUserDamntoken;
+import com.kimbrelk.da.oauth2.response.RespUserFriends;
 import com.kimbrelk.da.oauth2.response.RespUserFriendsWatching;
+import com.kimbrelk.da.oauth2.response.RespUserStatus;
+import com.kimbrelk.da.oauth2.response.RespUserStatuses;
+import com.kimbrelk.da.oauth2.response.RespUserWatchers;
 import com.kimbrelk.da.oauth2.response.RespUserWhoami;
 import com.kimbrelk.da.oauth2.response.RespUserWhois;
 import com.kimbrelk.da.oauth2.response.Response;
@@ -33,7 +37,7 @@ import java.util.Scanner;
 @SuppressWarnings("unused")
 public final class Main {
 	private final static ClientCredentials CREDENTIALS = new MyCredentials();
-	private final static AuthGrantType GRANT_TYPE = AuthGrantType.AUTHORIZATION_CODE;
+	private final static AuthGrantType GRANT_TYPE = AuthGrantType.CLIENT_CREDENTIALS;
 	private final static String URI_REDIRECT = "http://127.0.0.1/";
 	
 	public final static void main(String[] args) {
@@ -118,11 +122,16 @@ public final class Main {
 			// User Demos
 			// TODO
 			//demoUserDamntoken(oAuth2);
-			//demoUserFriendsSearch(oAuth2);
+			demoUserFriends(oAuth2);
+			demoUserFriendsSearch(oAuth2);
 			//demoUserFriendsUnwatch(oAuth2);
 			//demoUserFriendsWatch(oAuth2);
-			//demoUserFriendsWatching(oAuth2);
+			demoUserFriendsWatching(oAuth2);
 			//demoUserProfileUpdate(oAuth2);
+			demoUserStatus(oAuth2);
+			//demoUserStatusPost(oAuth2);
+			demoUserStatuses(oAuth2);
+			demoUserWatchers(oAuth2);
 			//demoUserWhoami(oAuth2);
 			//demoUserWhois(oAuth2);
 			
@@ -182,7 +191,7 @@ public final class Main {
 		Response resp = oAuth2.requestBrowseHot();
 		if (resp.isSuccess()) {
 			System.out.println("Title of first \'hot\' deviation: \"" + 
-				((RespDeviationsQuery)resp).getDeviations()[0].getTitle() + "\"");
+				((RespDeviationsQuery)resp).getResults()[0].getTitle() + "\"");
 		}
 		else {
 			System.out.println(resp);
@@ -194,7 +203,7 @@ public final class Main {
 		Response resp = oAuth2.requestBrowseMorelikethis("AA4C62ED-1020-3DDA-66BE-C3DD17C52CA2");
 		if (resp.isSuccess()) {
 			System.out.println("First deviation that is like \'Hair Step by step Winter edition tutorial\': \"" + 
-				((RespDeviationsQuery)resp).getDeviations()[0].getTitle() + "\"");
+				((RespDeviationsQuery)resp).getResults()[0].getTitle() + "\"");
 		}
 		else {
 			System.out.println(resp);
@@ -218,7 +227,7 @@ public final class Main {
 		Response resp = oAuth2.requestBrowseNewest(null, "java");
 		if (resp.isSuccess()) {
 			System.out.println("Title of newest \'java\' deviation: \"" + 
-				((RespDeviationsQuery)resp).getDeviations()[0].getTitle() + "\"");
+				((RespDeviationsQuery)resp).getResults()[0].getTitle() + "\"");
 		}
 		else {
 			System.out.println(resp);
@@ -230,7 +239,7 @@ public final class Main {
 		Response resp = oAuth2.requestBrowsePopular(null, "java", -1, -1, TimeRange.ALLTIME);
 		if (resp.isSuccess()) {
 			System.out.println("Title most popular \'java\' deviation of all time: \"" + 
-				((RespDeviationsQuery)resp).getDeviations()[0].getTitle() + "\"");
+				((RespDeviationsQuery)resp).getResults()[0].getTitle() + "\"");
 		}
 		else {
 			System.out.println(resp);
@@ -242,7 +251,7 @@ public final class Main {
 		Response resp = oAuth2.requestBrowseTags("android");
 		if (resp.isSuccess()) {
 			System.out.println("Title of first \'android\' tagged deviation: \"" + 
-				((RespDeviationsQuery)resp).getDeviations()[0].getTitle() + "\"");
+				((RespDeviationsQuery)resp).getResults()[0].getTitle() + "\"");
 		}
 		else {
 			System.out.println(resp);
@@ -266,7 +275,7 @@ public final class Main {
 		Response resp = oAuth2.requestBrowseUndiscovered();
 		if (resp.isSuccess()) {
 			System.out.println("Title of first undiscovered deviation: \"" + 
-				((RespDeviationsQuery)resp).getDeviations()[0].getTitle() + "\"");
+				((RespDeviationsQuery)resp).getResults()[0].getTitle() + "\"");
 		}
 		else {
 			System.out.println(resp);
@@ -278,7 +287,7 @@ public final class Main {
 		Response resp = oAuth2.requestBrowseUserJournals("baronbeandip");
 		if (resp.isSuccess()) {
 			System.out.println("Title of baronbeandip's newest featured journal: \"" + 
-				((RespDeviationsQuery)resp).getDeviations()[0].getTitle() + "\"");
+				((RespDeviationsQuery)resp).getResults()[0].getTitle() + "\"");
 		}
 		else {
 			System.out.println(resp);
@@ -316,7 +325,7 @@ public final class Main {
 		Response resp = oAuth2.requestGallery("baronbeandip", "181CADE2-DB26-A091-0118-6516A45BCF3C", GalleryMode.NEWEST);
 		if (resp.isSuccess()) {
 			System.out.println("Name of first deviation in baronbeandip's gallery folder \'Featured\': \"" + 
-				((RespGallery)resp).getDeviations()[0].getTitle() + "\"");
+				((RespGallery)resp).getResults()[0].getTitle() + "\"");
 		}
 		else {
 			System.out.println(resp);
@@ -388,6 +397,18 @@ public final class Main {
 		}
 		System.out.println();
 	}
+	private final static void demoUserFriends(OAuth2 oAuth2) {
+		System.out.println("demoUserFriends()");
+		Response resp;
+		resp = oAuth2.requestUserFriends("baronbeandip");
+		if (resp.isSuccess()) {
+			System.out.println("baronbeandip's first friend's name: \"" + ((RespUserFriends)resp).getResults()[0].getUser().getName() + "\".");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
 	private final static void demoUserFriendsSearch(OAuth2 oAuth2) {
 		System.out.println("demoUserFriendsSearch()");
 		Response resp;
@@ -451,7 +472,54 @@ public final class Main {
 			System.out.println("Profile successfully updated!");
 		}
 		else {
-			System.out.println("Failed to get your user info:");
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoUserStatus(OAuth2 oAuth2) {
+		System.out.println("demoUserStatus()");
+		Response resp;
+		resp = oAuth2.requestUserStatus("DEFFEA2D-369C-5396-4DA9-92B2B2C6A337");
+		if (resp.isSuccess()) {
+			System.out.println("Status text: \"" + ((RespUserStatus)resp).getStatus().getBody() + "\".");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoUserStatusPost(OAuth2 oAuth2) {
+		System.out.println("demoUserStatusPost()");
+		Response resp;
+		resp = oAuth2.requestUserStatusPost("I am bread.");
+		if (resp.isSuccess()) {
+			System.out.println("Successfully posted status.");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoUserStatuses(OAuth2 oAuth2) {
+		System.out.println("demoUserStatuses()");
+		Response resp;
+		resp = oAuth2.requestUserStatuses("baronbeandip");
+		if (resp.isSuccess()) {
+			System.out.println("First status of baronbeandip: \"" + ((RespUserStatuses)resp).getStatuses()[0].getBody() + "\".");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoUserWatchers(OAuth2 oAuth2) {
+		System.out.println("demoUserWatchers()");
+		Response resp;
+		resp = oAuth2.requestUserWatchers("baronbeandip");
+		if (resp.isSuccess()) {
+			System.out.println("baronbeandip's first watcher's name: \"" + ((RespUserWatchers)resp).getResults()[0].getUser().getName() + "\".");
+		}
+		else {
 			System.out.println(resp);
 		}
 		System.out.println();
@@ -464,7 +532,6 @@ public final class Main {
 			System.out.println("Your username is " + ((RespUserWhoami)resp).getUser().getName() + ".");
 		}
 		else {
-			System.out.println("Failed to get your user info:");
 			System.out.println(resp);
 		}
 		System.out.println();
@@ -478,7 +545,6 @@ public final class Main {
 			System.out.println(username + "'s real name is \'" + ((RespUserWhois)resp).getWhoisResults()[0].getRealName() + "\'.");
 		}
 		else {
-			System.out.println("Failed to get " + username + "\'s user info:");
 			System.out.println(resp);
 		}
 		System.out.println();

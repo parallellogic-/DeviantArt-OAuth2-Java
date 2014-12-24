@@ -1,20 +1,20 @@
 package com.kimbrelk.da.oauth2.response;
 
-import com.kimbrelk.da.oauth2.struct.Deviation;
+import com.kimbrelk.da.oauth2.struct.Friend;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class RespDeviationsQuery extends RespPagination<Deviation> {
-	public RespDeviationsQuery(JSONObject json) throws JSONException {
+public final class RespUserFriends extends RespPagination<Friend> {
+	public RespUserFriends(JSONObject json) throws JSONException {
 		super(json);
 	}
 	
 	@Override
 	protected final void getResultsFromJsonArray(JSONArray json) throws JSONException {
-		mResults = new Deviation[json.length()];
+		mResults = new Friend[json.length()];
 		for(int a=0; a<mResults.length; a++) {
-			mResults[a] = new Deviation(json.getJSONObject(a));
+			mResults[a] = new Friend(json.getJSONObject(a));
 		}
 	}
 }

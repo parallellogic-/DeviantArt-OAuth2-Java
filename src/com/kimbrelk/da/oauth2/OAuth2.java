@@ -15,7 +15,12 @@ import com.kimbrelk.da.oauth2.response.RespStashPublishUserdata;
 import com.kimbrelk.da.oauth2.response.RespStashSpace;
 import com.kimbrelk.da.oauth2.response.RespToken;
 import com.kimbrelk.da.oauth2.response.RespUserDamntoken;
+import com.kimbrelk.da.oauth2.response.RespUserFriends;
 import com.kimbrelk.da.oauth2.response.RespUserFriendsWatching;
+import com.kimbrelk.da.oauth2.response.RespUserStatus;
+import com.kimbrelk.da.oauth2.response.RespUserStatuses;
+import com.kimbrelk.da.oauth2.response.RespUserStatusPost;
+import com.kimbrelk.da.oauth2.response.RespUserWatchers;
 import com.kimbrelk.da.oauth2.response.RespUserWhoami;
 import com.kimbrelk.da.oauth2.response.RespUserWhois;
 import com.kimbrelk.da.oauth2.response.Response;
@@ -842,6 +847,45 @@ public final class OAuth2 {
 			return null;
 		}
 	}
+	public final Response requestUserFriends(String userName) {
+		return requestUserFriends(userName, null);
+	}
+	public final Response requestUserFriends(String userName, String expansions) {
+		return requestUserFriends(userName, expansions, -1, -1);
+	}
+	public final Response requestUserFriends(String userName, String expansions, int offset, int limit) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (userName == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		if (offset != -1) {
+			params.put("offset", offset + "");
+		}
+		if (limit != -1) {
+			params.put("limit", limit + "");
+		}
+		if (expansions != null) {
+			params.put("expand", expansions);
+		}
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.USER_FRIENDS + userName, params));
+		try {
+			if (!json.has("error")) {
+				return new RespUserFriends(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 	public final Response requestUserFriendsSearch(String query) {
 		return requestUserFriendsSearch(null, query);
 	}
@@ -984,6 +1028,141 @@ public final class OAuth2 {
 		try {
 			if (!json.has("error")) {
 				return new Response();
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestUserStatus(String statusId) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (statusId == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.USER_STATUSES + statusId, params));
+		try {
+			if (!json.has("error")) {
+				return new RespUserStatus(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestUserStatusPost(String body) {
+		return requestUserStatusPost(body, null, null, null);
+	}
+	public final Response requestUserStatusPost(String body, String objectId, String parentId, String stashId) {
+		Response respVerify = verifyScopesAndAuth(Scope.USER_MANAGE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (body == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		Map<String, String> postParams = new HashMap<String, String>();
+		postParams.put("body", body);
+		if (objectId != null) {
+			postParams.put("id", objectId);
+		}
+		if (parentId != null) {
+			postParams.put("parentid", parentId);
+		}
+		if (stashId != null) {
+			postParams.put("stashid", stashId);
+		}
+		JSONObject json = requestJSON(Verb.POST, createURL(ENDPOINTS.USER_STATUSES_POST, params), postParams);
+		try {
+			if (!json.has("error")) {
+				return new RespUserStatusPost(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestUserStatuses(String userName) {
+		return requestUserStatuses(userName, -1, -1);
+	}
+	public final Response requestUserStatuses(String userName, int offset, int limit) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (userName == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		params.put("username", userName);
+		if (offset != -1) {
+			params.put("offset", offset + "");
+		}
+		if (limit != -1) {
+			params.put("limit", limit + "");
+		}
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.USER_STATUSES, params));
+		try {
+			if (!json.has("error")) {
+				return new RespUserStatuses(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestUserWatchers(String userName) {
+		return requestUserWatchers(userName, null, -1, -1);
+	}
+	public final Response requestUserWatchers(String userName, String expansions) {
+		return requestUserWatchers(userName, expansions, -1, -1);
+	}
+	public final Response requestUserWatchers(String userName, String expansions, int offset, int limit) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (userName == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		if (offset != -1) {
+			params.put("offset", offset + "");
+		}
+		if (limit != -1) {
+			params.put("limit", limit + "");
+		}
+		if (expansions != null) {
+			params.put("expand", expansions);
+		}
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.USER_WATCHERS + userName, params));
+		try {
+			if (!json.has("error")) {
+				return new RespUserWatchers(json);
 			}
 			else {
 				return new RespError(json);

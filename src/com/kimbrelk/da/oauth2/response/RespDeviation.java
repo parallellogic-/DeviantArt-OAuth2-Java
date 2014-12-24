@@ -5,8 +5,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class RespDeviation extends Response {
-	public final static int ERROR_DEVIATION_NOT_FOUND = 0;
-	
 	private Deviation mResult;
 	
 	public RespDeviation(JSONObject json) throws JSONException {

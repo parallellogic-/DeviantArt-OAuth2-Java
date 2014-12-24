@@ -5,9 +5,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class RespDeviationContent extends Response {
-	public final static int ERROR_DEVIATION_NOT_FOUND = 0;
-	public final static int ERROR_UNSUPPORTED_DEVIATION_TYPE = 1;
-	
 	private String mCSS;
 	private String mFonts[];
 	private String mHTML;

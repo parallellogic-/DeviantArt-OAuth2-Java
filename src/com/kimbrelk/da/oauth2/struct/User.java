@@ -17,7 +17,13 @@ public final class User {
 		SENIOR,
 		VOLUNTEER
 	}
-
+	public enum Expansions {
+		USER_DETAILS,
+		USER_GEO,
+		USER_PROFILE,
+		USER_STATS
+	}
+	
 	private Details mDetails;
 	private Geo mGeo;
 	private String mIcon;

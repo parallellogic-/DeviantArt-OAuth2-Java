@@ -7,8 +7,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public final class RespBrowseMorelikethisPreview extends Response {
-	public final static int ERROR_INVALID_SEED = 0;
-	
 	private User mAuthor;
 	private Deviation[] mMoreFromArtist;
 	private Deviation[] mMoreFromDA;
