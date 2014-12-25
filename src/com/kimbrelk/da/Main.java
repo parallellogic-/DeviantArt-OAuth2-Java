@@ -12,6 +12,7 @@ import com.kimbrelk.da.oauth2.response.RespCuratedTags;
 import com.kimbrelk.da.oauth2.response.RespDeviation;
 import com.kimbrelk.da.oauth2.response.RespDeviationContent;
 import com.kimbrelk.da.oauth2.response.RespDeviationEmbeddedContent;
+import com.kimbrelk.da.oauth2.response.RespDeviationMetadata;
 import com.kimbrelk.da.oauth2.response.RespDeviationWhofaved;
 import com.kimbrelk.da.oauth2.response.RespDeviations;
 import com.kimbrelk.da.oauth2.response.RespDeviationsQuery;
@@ -110,10 +111,10 @@ public final class Main {
 			//demoCuratedTags(oAuth2);
 			
 			// Deviation Demos
-			// TODO
 			//demoDeviation(oAuth2);
 			//demoDeviationContent(oAuth2);
-			demoDeviationEmbeddedContent(oAuth2);
+			//demoDeviationEmbeddedContent(oAuth2);
+			demoDeviationMetadata(oAuth2);
 			//demoDeviationWhofaved(oAuth2);
 			
 			// Feed Demos
@@ -362,6 +363,18 @@ public final class Main {
 		if (resp.isSuccess()) {
 			System.out.println("First embedded deviation title: \"" + 
 				((RespDeviationEmbeddedContent)resp).getResults()[0].getTitle() + "\"");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoDeviationMetadata(OAuth2 oAuth2) {
+		System.out.println("demoDeviationMetadata()");
+		Response resp = oAuth2.requestDeviationMetadata(true, true, true, false, "D1AEBDC7-1701-1B37-E24F-E7D449BE7631");
+		if (resp.isSuccess()) {
+			System.out.println("This deviation was submitted with: \"" + 
+				((RespDeviationMetadata)resp).getResults()[0].getSubmission().getSubmitionApp().getName() + "\"");
 		}
 		else {
 			System.out.println(resp);

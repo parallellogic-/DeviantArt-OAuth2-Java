@@ -8,6 +8,7 @@ import com.kimbrelk.da.oauth2.response.RespCuratedTags;
 import com.kimbrelk.da.oauth2.response.RespDeviation;
 import com.kimbrelk.da.oauth2.response.RespDeviationContent;
 import com.kimbrelk.da.oauth2.response.RespDeviationEmbeddedContent;
+import com.kimbrelk.da.oauth2.response.RespDeviationMetadata;
 import com.kimbrelk.da.oauth2.response.RespDeviationWhofaved;
 import com.kimbrelk.da.oauth2.response.RespDeviations;
 import com.kimbrelk.da.oauth2.response.RespDeviationsQuery;
@@ -770,6 +771,40 @@ public final class OAuth2 {
 		try {
 			if (!json.has("error")) {
 				return new RespDeviationEmbeddedContent(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestDeviationMetadata(String... deviationIds) {
+		return requestDeviationMetadata(false, false, false, false, deviationIds);
+	}
+	public final Response requestDeviationMetadata(boolean includeCameraData, boolean includeSubmissionData, boolean includeStats, boolean includeCollectionData, String... deviationIds) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (deviationIds == null || deviationIds.length == 0) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		for(int a=0; a<deviationIds.length; a++) {
+			params.put("deviationids%5B" + a + "%5D", deviationIds[a]);
+		}
+		params.put("ext_camera", includeCameraData + "");
+		params.put("ext_collection", includeCollectionData + "");
+		params.put("ext_stats", includeStats + "");
+		params.put("ext_submission", includeSubmissionData + "");
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.DEVIATION_METADATA, params));
+		try {
+			if (!json.has("error")) {
+				return new RespDeviationMetadata(json);
 			}
 			else {
 				return new RespError(json);
