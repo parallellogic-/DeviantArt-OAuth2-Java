@@ -47,7 +47,7 @@ import java.util.Scanner;
 @SuppressWarnings("unused")
 public final class Main {
 	private final static ClientCredentials CREDENTIALS = new MyCredentials();
-	private final static AuthGrantType GRANT_TYPE = AuthGrantType.CLIENT_CREDENTIALS;
+	private final static AuthGrantType GRANT_TYPE = AuthGrantType.REFRESH_TOKEN;
 	private final static String URI_REDIRECT = "http://127.0.0.1/";
 	
 	public final static void main(String[] args) {
@@ -58,7 +58,7 @@ public final class Main {
 		Response resp;
 		if (GRANT_TYPE == AuthGrantType.CLIENT_CREDENTIALS) {
 			// Authenticate using the CLIENT_CREDENTIALS grant (no user login)
-			resp = oAuth2.requestAuthToken(AuthGrantType.CLIENT_CREDENTIALS, null, null);
+			resp = oAuth2.requestAuthToken(AuthGrantType.AUTHORIZATION_CODE, null, null);
 		}
 		else if (GRANT_TYPE == AuthGrantType.AUTHORIZATION_CODE) {
 			// Give the user the URL to authorize the app with
@@ -103,9 +103,10 @@ public final class Main {
 			//demoBrowseUserJournals(oAuth2);
 			
 			// Collections Demos
-			// TODO
-			demoCollections(oAuth2);
+			//demoCollections(oAuth2);
+			demoCollectionsFave(oAuth2);
 			//demoCollectionsFolders(oAuth2);
+			demoCollectionsUnfave(oAuth2);
 			
 			// Comment Demos
 			// TODO
@@ -311,7 +312,7 @@ public final class Main {
 		}
 		System.out.println();
 	}
-
+	
 	private final static void demoCollections(OAuth2 oAuth2) {
 		System.out.println("demoCollections()");
 		Response resp = oAuth2.requestCollections("baronbeandip", "7B151D6D-1D5F-25F7-C4D2-C049900470F1");
@@ -324,12 +325,34 @@ public final class Main {
 		}
 		System.out.println();
 	}
+	private final static void demoCollectionsFave(OAuth2 oAuth2) {
+		System.out.println("demoCollectionsFave()");
+		Response resp = oAuth2.requestCollectionsFave("AA4C62ED-1020-3DDA-66BE-C3DD17C52CA2");
+		if (resp.isSuccess()) {
+			System.out.println("Added deviation to faves.");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
 	private final static void demoCollectionsFolders(OAuth2 oAuth2) {
 		System.out.println("demoCollectionsFolders()");
 		Response resp = oAuth2.requestCollectionsFolders("baronbeandip");
 		if (resp.isSuccess()) {
 			System.out.println("Name of first collection of baronbeandip: \"" + 
 				((RespCollectionsFolders)resp).getResults()[0].getName() + "\"");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoCollectionsUnfave(OAuth2 oAuth2) {
+		System.out.println("demoCollectionsUnfave()");
+		Response resp = oAuth2.requestCollectionsUnFave("AA4C62ED-1020-3DDA-66BE-C3DD17C52CA2");
+		if (resp.isSuccess()) {
+			System.out.println("Removed deviation from faves.");
 		}
 		else {
 			System.out.println(resp);

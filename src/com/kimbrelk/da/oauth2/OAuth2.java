@@ -4,6 +4,7 @@ import com.kimbrelk.da.oauth2.response.RespBrowseMorelikethisPreview;
 import com.kimbrelk.da.oauth2.response.RespBrowseTagsSearch;
 import com.kimbrelk.da.oauth2.response.RespCategory;
 import com.kimbrelk.da.oauth2.response.RespCollections;
+import com.kimbrelk.da.oauth2.response.RespCollectionsFave;
 import com.kimbrelk.da.oauth2.response.RespCollectionsFolders;
 import com.kimbrelk.da.oauth2.response.RespCurated;
 import com.kimbrelk.da.oauth2.response.RespCuratedTags;
@@ -668,6 +669,37 @@ public final class OAuth2 {
 			return null;
 		}
 	}
+	public final Response requestCollectionsFave(String deviationId, String... folderIds) {
+		Response respVerify = verifyScopesAndAuth(Scope.BROWSE, Scope.COLLECTION);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (deviationId == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		Map<String, String> postParams = new HashMap<String, String>();
+		postParams.put("deviationid", deviationId);
+		if (folderIds != null) {
+			for(int a=0; a<folderIds.length; a++) {
+				postParams.put("folderid%5B" + a + "%5D", folderIds[a]);
+			}
+		}
+		JSONObject json = requestJSON(Verb.POST, createURL(ENDPOINTS.COLLECTIONS_FAVE, params), postParams);
+		try {
+			if (!json.has("error")) {
+				return new RespCollectionsFave(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 	public final Response requestCollectionsFolders() {
 		return requestCollectionsFolders(null, false, false);
 	}
@@ -697,6 +729,37 @@ public final class OAuth2 {
 		try {
 			if (!json.has("error")) {
 				return new RespCollectionsFolders(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestCollectionsUnFave(String deviationId, String... folderIds) {
+		Response respVerify = verifyScopesAndAuth(Scope.BROWSE, Scope.COLLECTION);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (deviationId == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		Map<String, String> postParams = new HashMap<String, String>();
+		postParams.put("deviationid", deviationId);
+		if (folderIds != null) {
+			for(int a=0; a<folderIds.length; a++) {
+				postParams.put("folderid%5B" + a + "%5D", folderIds[a]);
+			}
+		}
+		JSONObject json = requestJSON(Verb.POST, createURL(ENDPOINTS.COLLECTIONS_UNFAVE, params), postParams);
+		try {
+			if (!json.has("error")) {
+				return new RespCollectionsFave(json);
 			}
 			else {
 				return new RespError(json);
