@@ -7,6 +7,8 @@ import com.kimbrelk.da.oauth2.AuthGrantType;
 import com.kimbrelk.da.oauth2.response.RespBrowseMorelikethisPreview;
 import com.kimbrelk.da.oauth2.response.RespBrowseTagsSearch;
 import com.kimbrelk.da.oauth2.response.RespCategory;
+import com.kimbrelk.da.oauth2.response.RespCollections;
+import com.kimbrelk.da.oauth2.response.RespCollectionsFolders;
 import com.kimbrelk.da.oauth2.response.RespCurated;
 import com.kimbrelk.da.oauth2.response.RespCuratedTags;
 import com.kimbrelk.da.oauth2.response.RespDeviation;
@@ -102,6 +104,8 @@ public final class Main {
 			
 			// Collections Demos
 			// TODO
+			demoCollections(oAuth2);
+			//demoCollectionsFolders(oAuth2);
 			
 			// Comment Demos
 			// TODO
@@ -114,7 +118,7 @@ public final class Main {
 			//demoDeviation(oAuth2);
 			//demoDeviationContent(oAuth2);
 			//demoDeviationEmbeddedContent(oAuth2);
-			demoDeviationMetadata(oAuth2);
+			//demoDeviationMetadata(oAuth2);
 			//demoDeviationWhofaved(oAuth2);
 			
 			// Feed Demos
@@ -308,6 +312,31 @@ public final class Main {
 		System.out.println();
 	}
 
+	private final static void demoCollections(OAuth2 oAuth2) {
+		System.out.println("demoCollections()");
+		Response resp = oAuth2.requestCollections("baronbeandip", "7B151D6D-1D5F-25F7-C4D2-C049900470F1");
+		if (resp.isSuccess()) {
+			System.out.println("Name of first deviation in baronbeandip's Featured collection: \"" + 
+				((RespCollections)resp).getResults()[0].getTitle() + "\"");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoCollectionsFolders(OAuth2 oAuth2) {
+		System.out.println("demoCollectionsFolders()");
+		Response resp = oAuth2.requestCollectionsFolders("baronbeandip");
+		if (resp.isSuccess()) {
+			System.out.println("Name of first collection of baronbeandip: \"" + 
+				((RespCollectionsFolders)resp).getResults()[0].getName() + "\"");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	
 	private final static void demoCurated(OAuth2 oAuth2) {
 		System.out.println("demoCurated()");
 		Response resp;

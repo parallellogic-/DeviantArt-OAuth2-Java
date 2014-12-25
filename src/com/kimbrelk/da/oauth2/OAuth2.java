@@ -3,6 +3,8 @@ package com.kimbrelk.da.oauth2;
 import com.kimbrelk.da.oauth2.response.RespBrowseMorelikethisPreview;
 import com.kimbrelk.da.oauth2.response.RespBrowseTagsSearch;
 import com.kimbrelk.da.oauth2.response.RespCategory;
+import com.kimbrelk.da.oauth2.response.RespCollections;
+import com.kimbrelk.da.oauth2.response.RespCollectionsFolders;
 import com.kimbrelk.da.oauth2.response.RespCurated;
 import com.kimbrelk.da.oauth2.response.RespCuratedTags;
 import com.kimbrelk.da.oauth2.response.RespDeviation;
@@ -619,7 +621,93 @@ public final class OAuth2 {
 			return null;
 		}
 	}
-
+	
+	public final Response requestCollections(String folderId) {
+		return requestCollections(null, folderId, -1, -1);
+	}
+	public final Response requestCollections(String userName, String folderId) {
+		return requestCollections(userName, folderId, -1, -1);
+	}
+	public final Response requestCollections(String userName, String folderId, int offset, int limit) {
+		return requestCollections(userName, folderId, offset, limit, SHOW_MATURE_DEFAULT);
+	}
+	public final Response requestCollections(String userName, String folderId, int offset, int limit, boolean showMature) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (userName == null && hasRefreshToken()) {
+			return RespError.INVALID_REQUEST;
+		}
+		if (folderId == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		if (userName != null) {
+			params.put("username", userName);
+		}
+		if (offset != -1) {
+			params.put("offset", offset + "");
+		}
+		if (limit != -1) {
+			params.put("limit", limit + "");
+		}
+		params.put("mature_content", showMature + "");
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.COLLECTIONS + folderId, params));
+		try {
+			if (!json.has("error")) {
+				return new RespCollections(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestCollectionsFolders() {
+		return requestCollectionsFolders(null, false, false);
+	}
+	public final Response requestCollectionsFolders(String userName) {
+		return requestCollectionsFolders(userName, false, false);
+	}
+	public final Response requestCollectionsFolders(String userName, boolean calculateSize, boolean preloadDeviations) {
+		return requestCollectionsFolders(userName, calculateSize, preloadDeviations, SHOW_MATURE_DEFAULT);
+	}
+	public final Response requestCollectionsFolders(String userName, boolean calculateSize, boolean preloadDeviations, boolean showMature) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (userName == null && hasRefreshToken()) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		if (userName != null) {
+			params.put("username", userName);
+		}
+		params.put("calculate_size", calculateSize + "");
+		params.put("ext_preload", preloadDeviations + "");
+		params.put("mature_content", showMature + "");
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.COLLECTIONS_FOLDERS, params));
+		try {
+			if (!json.has("error")) {
+				return new RespCollectionsFolders(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 	public final Response requestCurated() {
 		return requestCurated(0, null);
 	}
