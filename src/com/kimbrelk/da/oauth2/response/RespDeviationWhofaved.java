@@ -1,20 +1,21 @@
 package com.kimbrelk.da.oauth2.response;
 
-import com.kimbrelk.da.oauth2.struct.Friend;
+import com.kimbrelk.da.oauth2.struct.Whofaved;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public final class RespUserFriends extends RespPaginationOffset<Friend> {
-	public RespUserFriends(JSONObject json) throws JSONException {
+public class RespDeviationWhofaved extends RespPaginationOffset<Whofaved> {
+	
+	public RespDeviationWhofaved(JSONObject json) throws JSONException {
 		super(json, "results");
 	}
 	
 	@Override
 	protected final void getResultsFromJsonArray(JSONArray json) throws JSONException {
-		mResults = new Friend[json.length()];
+		mResults = new Whofaved[json.length()];
 		for(int a=0; a<mResults.length; a++) {
-			mResults[a] = new Friend(json.getJSONObject(a));
+			mResults[a] = new Whofaved(json.getJSONObject(a));
 		}
 	}
 }

@@ -5,8 +5,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class RespDeviationsQuery extends RespPaginationOffset<Deviation> {
-	public RespDeviationsQuery(JSONObject json) throws JSONException {
+public class RespDeviationEmbeddedContent extends RespPaginationOffsetFull<Deviation> {
+	public RespDeviationEmbeddedContent(JSONObject json) throws JSONException {
 		super(json, "results");
 	}
 	

@@ -5,9 +5,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public final class RespCurated extends RespOffsetPagination<CuratedModule> {
+public final class RespCurated extends RespPaginationOffset<CuratedModule> {
 	public RespCurated(JSONObject json) throws JSONException {
-		super(json);
+		super(json, "results");
 	}
 	
 	@Override

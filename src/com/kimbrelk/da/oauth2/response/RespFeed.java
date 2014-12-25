@@ -5,7 +5,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public final class RespFeed extends RespCursorPagination<Feed> {
+public final class RespFeed extends RespPaginationCursor<Feed> {
 	public RespFeed(JSONObject json) throws JSONException {
 		super(json);
 	}

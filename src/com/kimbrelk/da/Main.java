@@ -11,6 +11,8 @@ import com.kimbrelk.da.oauth2.response.RespCurated;
 import com.kimbrelk.da.oauth2.response.RespCuratedTags;
 import com.kimbrelk.da.oauth2.response.RespDeviation;
 import com.kimbrelk.da.oauth2.response.RespDeviationContent;
+import com.kimbrelk.da.oauth2.response.RespDeviationEmbeddedContent;
+import com.kimbrelk.da.oauth2.response.RespDeviationWhofaved;
 import com.kimbrelk.da.oauth2.response.RespDeviations;
 import com.kimbrelk.da.oauth2.response.RespDeviationsQuery;
 import com.kimbrelk.da.oauth2.response.RespError;
@@ -42,7 +44,7 @@ import java.util.Scanner;
 @SuppressWarnings("unused")
 public final class Main {
 	private final static ClientCredentials CREDENTIALS = new MyCredentials();
-	private final static AuthGrantType GRANT_TYPE = AuthGrantType.REFRESH_TOKEN;
+	private final static AuthGrantType GRANT_TYPE = AuthGrantType.CLIENT_CREDENTIALS;
 	private final static String URI_REDIRECT = "http://127.0.0.1/";
 	
 	public final static void main(String[] args) {
@@ -111,10 +113,12 @@ public final class Main {
 			// TODO
 			//demoDeviation(oAuth2);
 			//demoDeviationContent(oAuth2);
+			demoDeviationEmbeddedContent(oAuth2);
+			//demoDeviationWhofaved(oAuth2);
 			
 			// Feed Demos
 			//demoFeedHome(oAuth2);
-			demoFeedNotifications(oAuth2);
+			//demoFeedNotifications(oAuth2);
 			//demoFeedProfile(oAuth2);
 			
 			// Gallery Demos
@@ -346,6 +350,30 @@ public final class Main {
 		if (resp.isSuccess()) {
 			System.out.println("Deviation html: \"" + 
 				((RespDeviationContent)resp).getHTML() + "\"");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoDeviationEmbeddedContent(OAuth2 oAuth2) {
+		System.out.println("demoDeviationEmbeddedContent()");
+		Response resp = oAuth2.requestDeviationEmbeddedContent("E68E7B6F-263C-9934-1636-6AF1B50B60F5");
+		if (resp.isSuccess()) {
+			System.out.println("First embedded deviation title: \"" + 
+				((RespDeviationEmbeddedContent)resp).getResults()[0].getTitle() + "\"");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoDeviationWhofaved(OAuth2 oAuth2) {
+		System.out.println("demoDeviationWhofaved()");
+		Response resp = oAuth2.requestDeviationWhofaved("D1AEBDC7-1701-1B37-E24F-E7D449BE7631");
+		if (resp.isSuccess()) {
+			System.out.println("A user who faved the specified deviation: \"" + 
+				((RespDeviationWhofaved)resp).getResults()[0].getUser().getName() + "\"");
 		}
 		else {
 			System.out.println(resp);

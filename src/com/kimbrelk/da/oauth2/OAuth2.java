@@ -7,6 +7,8 @@ import com.kimbrelk.da.oauth2.response.RespCurated;
 import com.kimbrelk.da.oauth2.response.RespCuratedTags;
 import com.kimbrelk.da.oauth2.response.RespDeviation;
 import com.kimbrelk.da.oauth2.response.RespDeviationContent;
+import com.kimbrelk.da.oauth2.response.RespDeviationEmbeddedContent;
+import com.kimbrelk.da.oauth2.response.RespDeviationWhofaved;
 import com.kimbrelk.da.oauth2.response.RespDeviations;
 import com.kimbrelk.da.oauth2.response.RespDeviationsQuery;
 import com.kimbrelk.da.oauth2.response.RespError;
@@ -338,23 +340,23 @@ public final class OAuth2 {
 			return null;
 		}
 	}
-	public final Response requestBrowseMorelikethis(String deviationUUID) {
-		return requestBrowseMorelikethis(deviationUUID, null);
+	public final Response requestBrowseMorelikethis(String deviationId) {
+		return requestBrowseMorelikethis(deviationId, null);
 	}
-	public final Response requestBrowseMorelikethis(String deviationUUID, String categoryPath) {
-		return requestBrowseMorelikethis(deviationUUID, categoryPath, -1, -1);
+	public final Response requestBrowseMorelikethis(String deviationId, String categoryPath) {
+		return requestBrowseMorelikethis(deviationId, categoryPath, -1, -1);
 	}
-	public final Response requestBrowseMorelikethis(String deviationUUID, String categoryPath, int offset, int limit) {
+	public final Response requestBrowseMorelikethis(String deviationId, String categoryPath, int offset, int limit) {
 		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE, Scope.BROWSE_MLT);
 		if (respVerify.isError()) {
 			return respVerify;
 		}
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("access_token", mToken.getToken());
-		if (deviationUUID == null) {
+		if (deviationId == null) {
 			return RespError.INVALID_REQUEST;
 		}
-		params.put("seed", deviationUUID);
+		params.put("seed", deviationId);
 		if (categoryPath != null) {
 			params.put("category_path", categoryPath);
 		}
@@ -378,17 +380,17 @@ public final class OAuth2 {
 			return null;
 		}
 	}
-	public final Response requestBrowseMorelikethisPreview(String deviationUUID) {
+	public final Response requestBrowseMorelikethisPreview(String deviationId) {
 		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE, Scope.BROWSE_MLT);
 		if (respVerify.isError()) {
 			return respVerify;
 		}
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("access_token", mToken.getToken());
-		if (deviationUUID == null) {
+		if (deviationId == null) {
 			return RespError.INVALID_REQUEST;
 		}
-		params.put("seed", deviationUUID);
+		params.put("seed", deviationId);
 		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.BROWSE_MORELIKETHIS_PREV, params));
 		try {
 			if (!json.has("error")) {
@@ -686,17 +688,17 @@ public final class OAuth2 {
 		}
 	}
 	
-	public final Response requestDeviation(String deviationUUID) {
+	public final Response requestDeviation(String deviationId) {
 		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
 		if (respVerify.isError()) {
 			return respVerify;
 		}
-		if (deviationUUID == null) {
+		if (deviationId == null) {
 			return RespError.INVALID_REQUEST;
 		}
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("access_token", mToken.getToken());
-		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.DEVIATION + deviationUUID, params));
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.DEVIATION + deviationId, params));
 		try {
 			if (!json.has("error")) {
 				return new RespDeviation(json);
@@ -710,21 +712,107 @@ public final class OAuth2 {
 			return null;
 		}
 	}
-	public final Response requestDeviationContent(String deviationUUID) {
+	public final Response requestDeviationContent(String deviationId) {
 		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
 		if (respVerify.isError()) {
 			return respVerify;
 		}
-		if (deviationUUID == null) {
+		if (deviationId == null) {
 			return RespError.INVALID_REQUEST;
 		}
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("access_token", mToken.getToken());
-		params.put("deviationid", deviationUUID);
+		params.put("deviationid", deviationId);
 		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.DEVIATION_CONTENT, params));
 		try {
 			if (!json.has("error")) {
 				return new RespDeviationContent(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestDeviationEmbeddedContent(String deviationId) {
+		return requestDeviationEmbeddedContent(deviationId, null);
+	}
+	public final Response requestDeviationEmbeddedContent(String deviationId, String offsetDeviationId) {
+		return requestDeviationEmbeddedContent(deviationId, offsetDeviationId, -1, -1);
+	}
+	public final Response requestDeviationEmbeddedContent(String deviationId, int offset, int limit) {
+		return requestDeviationEmbeddedContent(deviationId, null, offset, limit);
+	}
+	public final Response requestDeviationEmbeddedContent(String deviationId, String offsetDeviationId, int offset, int limit) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (deviationId == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		params.put("deviationid", deviationId);
+		if (offsetDeviationId != null) {
+			params.put("offset_deviationid", offsetDeviationId);
+		}
+		if (offset != -1) {
+			params.put("offset", offset + "");
+		}
+		if (limit != -1) {
+			params.put("limit", limit + "");
+		}
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.DEVIATION_EMBEDDED, params));
+		try {
+			if (!json.has("error")) {
+				return new RespDeviationEmbeddedContent(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestDeviationWhofaved(String deviationId) {
+		return requestDeviationWhofaved(deviationId, null);
+	}
+	public final Response requestDeviationWhofaved(String deviationId, String expand) {
+		return requestDeviationWhofaved(deviationId, -1, -1, expand);
+	}
+	public final Response requestDeviationWhofaved(String deviationId, int offset, int limit) {
+		return requestDeviationWhofaved(deviationId, offset, limit, null);
+	}
+	public final Response requestDeviationWhofaved(String deviationId, int offset, int limit, String expansions) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (deviationId == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		params.put("deviationid", deviationId);
+		if (offset != -1) {
+			params.put("offset", offset + "");
+		}
+		if (limit != -1) {
+			params.put("limit", limit + "");
+		}
+		if (expansions != null) {
+			params.put("expand", expansions);
+		}
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.DEVIATION_WHOFAVED, params));
+		try {
+			if (!json.has("error")) {
+				return new RespDeviationWhofaved(json);
 			}
 			else {
 				return new RespError(json);
