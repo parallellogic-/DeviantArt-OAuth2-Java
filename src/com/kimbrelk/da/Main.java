@@ -50,7 +50,7 @@ import java.util.Scanner;
 @SuppressWarnings("unused")
 public final class Main {
 	private final static ClientCredentials CREDENTIALS = new MyCredentials();
-	private final static AuthGrantType GRANT_TYPE = AuthGrantType.REFRESH_TOKEN;
+	private final static AuthGrantType GRANT_TYPE = AuthGrantType.CLIENT_CREDENTIALS;
 	private final static String URI_REDIRECT = "http://127.0.0.1/";
 	
 	public final static void main(String[] args) {
@@ -145,7 +145,7 @@ public final class Main {
 			//demoStashDelete(oAuth2);
 			//demoStashFolder(oAuth2);
 			//demoStashMedia(oAuth2);
-			//demoStashMetadata(oAuth2);
+			demoStashMetadata(oAuth2);
 			//demoStashMetadataFolder(oAuth2);
 			//demoStashPublishCategorytree(oAuth2);
 			//demoStashPublishUserdata(oAuth2);

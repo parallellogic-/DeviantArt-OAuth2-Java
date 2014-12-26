@@ -1515,7 +1515,7 @@ public final class OAuth2 {
 		}
 	}
 	public final Response requestStashMedia(long stashId) {
-		Response respVerify = verifyScopesAndAuth(Scope.STASH);
+		Response respVerify = verifyScopesAndAuth(true, Scope.STASH);
 		if (respVerify.isError()) {
 			return respVerify;
 		}
@@ -1543,7 +1543,7 @@ public final class OAuth2 {
 		return requestStashMetadata(stashId, false, false, false);
 	}
 	public final Response requestStashMetadata(long stashId, boolean extSubmission, boolean extCamera, boolean extStats) {
-		Response respVerify = verifyScopesAndAuth(Scope.STASH);
+		Response respVerify = verifyScopesAndAuth(true, Scope.STASH);
 		if (respVerify.isError()) {
 			return respVerify;
 		}
@@ -1574,7 +1574,7 @@ public final class OAuth2 {
 		return requestStashMetadataFolder(folderId, false, false, false, false);
 	}
 	public final Response requestStashMetadataFolder(long folderId, boolean list, boolean extSubmission, boolean extCamera, boolean extStats) {
-		Response respVerify = verifyScopesAndAuth(Scope.STASH);
+		Response respVerify = verifyScopesAndAuth(true, Scope.STASH);
 		if (respVerify.isError()) {
 			return respVerify;
 		}
