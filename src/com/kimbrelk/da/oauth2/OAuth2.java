@@ -23,6 +23,10 @@ import com.kimbrelk.da.oauth2.response.RespFeedNotifications;
 import com.kimbrelk.da.oauth2.response.RespFriends;
 import com.kimbrelk.da.oauth2.response.RespGallery;
 import com.kimbrelk.da.oauth2.response.RespGalleryFolders;
+import com.kimbrelk.da.oauth2.response.RespStashDelete;
+import com.kimbrelk.da.oauth2.response.RespStashFolder;
+import com.kimbrelk.da.oauth2.response.RespStashMedia;
+import com.kimbrelk.da.oauth2.response.RespStashMetadata;
 import com.kimbrelk.da.oauth2.response.RespStashPublishUserdata;
 import com.kimbrelk.da.oauth2.response.RespStashSpace;
 import com.kimbrelk.da.oauth2.response.RespToken;
@@ -1459,6 +1463,145 @@ public final class OAuth2 {
 		}
 	}
 	
+	public final Response requestStashDelete(long stashId) {
+		Response respVerify = verifyScopesAndAuth(Scope.STASH);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (stashId == -1) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		params.put("stashid", stashId+"");
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.STASH_DELETE, params));
+		try {
+			if (!json.has("error")) {
+				return new RespStashDelete(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestStashFolder(long folderId, String folderName) {
+		Response respVerify = verifyScopesAndAuth(Scope.STASH);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (folderName == null || folderId == -1) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		params.put("folder", folderName);
+		params.put("folderid", folderId + "");
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.STASH_FOLDER, params));
+		try {
+			if (!json.has("error")) {
+				return new RespStashFolder(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestStashMedia(long stashId) {
+		Response respVerify = verifyScopesAndAuth(Scope.STASH);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (stashId == -1) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		params.put("stashid", stashId + "");
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.STASH_MEDIA, params));
+		try {
+			if (!json.has("error")) {
+				return new RespStashMedia(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestStashMetadata(long stashId) {
+		return requestStashMetadata(stashId, false, false, false);
+	}
+	public final Response requestStashMetadata(long stashId, boolean extSubmission, boolean extCamera, boolean extStats) {
+		Response respVerify = verifyScopesAndAuth(Scope.STASH);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (stashId == -1) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		params.put("stashid", stashId + "");
+		params.put("ext_submission", extSubmission + "");
+		params.put("ext_camera", extCamera + "");
+		params.put("ext_stats", extStats + "");
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.STASH_METADATA, params));
+		try {
+			if (!json.has("error")) {
+				return new RespStashMetadata(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestStashMetadataFolder(long folderId) {
+		return requestStashMetadataFolder(folderId, false, false, false, false);
+	}
+	public final Response requestStashMetadataFolder(long folderId, boolean list, boolean extSubmission, boolean extCamera, boolean extStats) {
+		Response respVerify = verifyScopesAndAuth(Scope.STASH);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (folderId == -1) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		params.put("folderid", folderId + "");
+		params.put("list", list + "");
+		params.put("ext_submission", extSubmission + "");
+		params.put("ext_camera", extCamera + "");
+		params.put("ext_stats", extStats + "");
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.STASH_METADATA, params));
+		try {
+			if (!json.has("error")) {
+				return new RespStashMetadata(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 	public final Response requestStashPublishCategorytree() {
 		return requestStashPublishCategorytree("/");
 	}

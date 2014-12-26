@@ -26,6 +26,8 @@ import com.kimbrelk.da.oauth2.response.RespFeedNotifications;
 import com.kimbrelk.da.oauth2.response.RespFriends;
 import com.kimbrelk.da.oauth2.response.RespGallery;
 import com.kimbrelk.da.oauth2.response.RespGalleryFolders;
+import com.kimbrelk.da.oauth2.response.RespStashMedia;
+import com.kimbrelk.da.oauth2.response.RespStashMetadata;
 import com.kimbrelk.da.oauth2.response.RespStashPublishUserdata;
 import com.kimbrelk.da.oauth2.response.RespStashSpace;
 import com.kimbrelk.da.oauth2.response.RespUserDamntoken;
@@ -43,7 +45,6 @@ import com.kimbrelk.da.oauth2.struct.ArtistSpeciality;
 import com.kimbrelk.da.oauth2.struct.GalleryMode;
 import com.kimbrelk.da.oauth2.struct.TimeRange;
 import com.kimbrelk.da.oauth2.struct.Watch;
-
 import java.util.Scanner;
 
 @SuppressWarnings("unused")
@@ -141,6 +142,11 @@ public final class Main {
 			
 			// Sta.sh Demos
 			// TODO
+			//demoStashDelete(oAuth2);
+			//demoStashFolder(oAuth2);
+			//demoStashMedia(oAuth2);
+			//demoStashMetadata(oAuth2);
+			//demoStashMetadataFolder(oAuth2);
 			//demoStashPublishCategorytree(oAuth2);
 			//demoStashPublishUserdata(oAuth2);
 			//demoStashSpace(oAuth2);
@@ -606,6 +612,66 @@ public final class Main {
 		System.out.println();
 	}
 	
+	private final static void demoStashDelete(OAuth2 oAuth2) {
+		System.out.println("demoStashDelete()");
+		Response resp;
+		resp = oAuth2.requestStashDelete(8822652551090346L);
+		if (resp.isSuccess()) {
+			System.out.println("Successfully deleted file.");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoStashFolder(OAuth2 oAuth2) {
+		System.out.println("demoStashFolder()");
+		Response resp;
+		resp = oAuth2.requestStashFolder(6863479255399202L, "Rename Test");
+		if (resp.isSuccess()) {
+			System.out.println("Successfully renamed folder.");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoStashMedia(OAuth2 oAuth2) {
+		System.out.println("demoStashMedia()");
+		Response resp;
+		resp = oAuth2.requestStashMedia(4784739373778459L);
+		if (resp.isSuccess()) {
+			System.out.println(((RespStashMedia)resp).getURL());
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoStashMetadata(OAuth2 oAuth2) {
+		System.out.println("demoStashMetadata()");
+		Response resp;
+		resp = oAuth2.requestStashMetadata(4784739373778459L);
+		if (resp.isSuccess()) {
+			System.out.println("Stash item name: " + ((RespStashMetadata)resp).getMetadata().getTitle());
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoStashMetadataFolder(OAuth2 oAuth2) {
+		System.out.println("demoStashMetadataFolder()");
+		Response resp;
+		resp = oAuth2.requestStashMetadataFolder(6863479255399202L);
+		if (resp.isSuccess()) {
+			System.out.println("Stash folder name: " + ((RespStashMetadata)resp).getMetadata().getTitle());
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
 	private final static void demoStashPublishCategorytree(OAuth2 oAuth2) {
 		System.out.println("demoStashPublishCategorytree()");
 		Response resp = oAuth2.requestStashPublishCategorytree("/", "png");
