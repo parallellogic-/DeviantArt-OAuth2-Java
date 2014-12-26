@@ -9,6 +9,8 @@ import com.kimbrelk.da.oauth2.response.RespBrowseTagsSearch;
 import com.kimbrelk.da.oauth2.response.RespCategory;
 import com.kimbrelk.da.oauth2.response.RespCollections;
 import com.kimbrelk.da.oauth2.response.RespCollectionsFolders;
+import com.kimbrelk.da.oauth2.response.RespComment;
+import com.kimbrelk.da.oauth2.response.RespComments;
 import com.kimbrelk.da.oauth2.response.RespCurated;
 import com.kimbrelk.da.oauth2.response.RespCuratedTags;
 import com.kimbrelk.da.oauth2.response.RespDeviation;
@@ -58,7 +60,7 @@ public final class Main {
 		Response resp;
 		if (GRANT_TYPE == AuthGrantType.CLIENT_CREDENTIALS) {
 			// Authenticate using the CLIENT_CREDENTIALS grant (no user login)
-			resp = oAuth2.requestAuthToken(AuthGrantType.AUTHORIZATION_CODE, null, null);
+			resp = oAuth2.requestAuthToken(AuthGrantType.CLIENT_CREDENTIALS, null, null);
 		}
 		else if (GRANT_TYPE == AuthGrantType.AUTHORIZATION_CODE) {
 			// Give the user the URL to authorize the app with
@@ -104,12 +106,18 @@ public final class Main {
 			
 			// Collections Demos
 			//demoCollections(oAuth2);
-			demoCollectionsFave(oAuth2);
+			//demoCollectionsFave(oAuth2);
 			//demoCollectionsFolders(oAuth2);
-			demoCollectionsUnfave(oAuth2);
+			//demoCollectionsUnfave(oAuth2);
 			
 			// Comment Demos
-			// TODO
+			//demoCommentsDeviation(oAuth2);
+			//demoCommentsPostDeviation(oAuth2);
+			//demoCommentsPostProfile(oAuth2);
+			//demoCommentsPostStatus(oAuth2);
+			//demoCommentsProfile(oAuth2);
+			//demoCommentsSiblings(oAuth2);
+			//demoCommentsStatus(oAuth2);
 			
 			// Curated Demos
 			//demoCurated(oAuth2);
@@ -353,6 +361,91 @@ public final class Main {
 		Response resp = oAuth2.requestCollectionsUnFave("AA4C62ED-1020-3DDA-66BE-C3DD17C52CA2");
 		if (resp.isSuccess()) {
 			System.out.println("Removed deviation from faves.");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	
+	private final static void demoCommentsDeviation(OAuth2 oAuth2) {
+		System.out.println("demoCommentsDeviation()");
+		Response resp = oAuth2.requestCommentsDeviation("48EB2341-8862-4D88-C38D-5567AAD334BA");
+		if (resp.isSuccess()) {
+			System.out.println("First comment on baronbeandip's deviation: \"" + 
+				((RespComments)resp).getResults()[0].getBody() + " by " + ((RespComments)resp).getResults()[0].getUser().getName() + "\"");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoCommentsPostDeviation(OAuth2 oAuth2) {
+		System.out.println("demoCommentsPostDeviation()");
+		Response resp = oAuth2.requestCommentsPostDeviation("48EB2341-8862-4D88-C38D-5567AAD334BA", "This is a comment.");
+		if (resp.isSuccess()) {
+			System.out.println("The comment you posted on a deviation: \"" + 
+				((RespComment)resp).getComment().getBody() + " by " + ((RespComment)resp).getComment().getUser().getName() + "\"");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoCommentsPostProfile(OAuth2 oAuth2) {
+		System.out.println("demoCommentsPostProfile()");
+		Response resp = oAuth2.requestCommentsPostProfile("baronbeandip", "This is a comment.");
+		if (resp.isSuccess()) {
+			System.out.println("The comment you posted on a profile: \"" + 
+				((RespComment)resp).getComment().getBody() + " by " + ((RespComment)resp).getComment().getUser().getName() + "\"");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoCommentsPostStatus(OAuth2 oAuth2) {
+		System.out.println("demoCommentsPostStatus()");
+		Response resp = oAuth2.requestCommentsPostStatus("3667C583-69C9-1EAE-017C-9174FA1A59C8", "This is yet another comment.");
+		if (resp.isSuccess()) {
+			System.out.println("The comment you posted on a status: \"" + 
+				((RespComment)resp).getComment().getBody() + " by " + ((RespComment)resp).getComment().getUser().getName() + "\"");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoCommentsProfile(OAuth2 oAuth2) {
+		System.out.println("demoCommentsProfile()");
+		Response resp = oAuth2.requestCommentsProfile("baronbeandip");
+		if (resp.isSuccess()) {
+			System.out.println("First comment on baronbeandip's profile: \"" + 
+				((RespComments)resp).getResults()[0].getBody() + " by " + ((RespComments)resp).getResults()[0].getUser().getName() + "\"");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoCommentsSiblings(OAuth2 oAuth2) {
+		System.out.println("demoCommentsSiblings()");
+		Response resp = oAuth2.requestCommentsSiblings("AF24C4C1-B4C6-2857-9746-19346F55C177", -1, -10, -1);
+		if (resp.isSuccess()) {
+			System.out.println("Sibling previous to baronbeandip's first comment: \"" + 
+				((RespComments)resp).getResults()[0].getBody() + " by " + ((RespComments)resp).getResults()[0].getUser().getName() + "\"");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoCommentsStatus(OAuth2 oAuth2) {
+		System.out.println("demoCommentsStatus()");
+		Response resp = oAuth2.requestCommentsStatus("3667C583-69C9-1EAE-017C-9174FA1A59C8");
+		if (resp.isSuccess()) {
+			System.out.println("First comment on one of baronbeandip's status's: \"" + 
+				((RespComments)resp).getResults()[0].getBody() + " by " + ((RespComments)resp).getResults()[0].getUser().getName() + "\"");
 		}
 		else {
 			System.out.println(resp);

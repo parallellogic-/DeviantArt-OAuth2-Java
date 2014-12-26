@@ -6,6 +6,8 @@ import com.kimbrelk.da.oauth2.response.RespCategory;
 import com.kimbrelk.da.oauth2.response.RespCollections;
 import com.kimbrelk.da.oauth2.response.RespCollectionsFave;
 import com.kimbrelk.da.oauth2.response.RespCollectionsFolders;
+import com.kimbrelk.da.oauth2.response.RespComment;
+import com.kimbrelk.da.oauth2.response.RespComments;
 import com.kimbrelk.da.oauth2.response.RespCurated;
 import com.kimbrelk.da.oauth2.response.RespCuratedTags;
 import com.kimbrelk.da.oauth2.response.RespDeviation;
@@ -760,6 +762,277 @@ public final class OAuth2 {
 		try {
 			if (!json.has("error")) {
 				return new RespCollectionsFave(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public final Response requestCommentsDeviation(String deviationId) {
+		return requestCommentsDeviation(deviationId, null);
+	}
+	public final Response requestCommentsDeviation(String deviationId, String commentId) {
+		return requestCommentsDeviation(deviationId, commentId, -1);
+	}
+	public final Response requestCommentsDeviation(String deviationId, String commentId, int maxDepth) {
+		return requestCommentsDeviation(deviationId, commentId, maxDepth, -1, -1);
+	}
+	public final Response requestCommentsDeviation(String deviationId, String commentId, int maxDepth, int offset, int limit) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (deviationId == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		if (commentId != null) {
+			params.put("commentid", commentId);
+		}
+		if (maxDepth != -1) {
+			params.put("maxdepth", maxDepth + "");
+		}
+		if (offset != -1) {
+			params.put("offset", offset + "");
+		}
+		if (limit != -1) {
+			params.put("limit", limit + "");
+		}
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.COMMENTS_DEVIATION + deviationId, params));
+		try {
+			if (!json.has("error")) {
+				return new RespComments(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestCommentsPostDeviation(String deviationId, String body) {
+		return requestCommentsPostDeviation(deviationId, body, null);
+	}
+	public final Response requestCommentsPostDeviation(String deviationId, String body, String commentId) {
+		Response respVerify = verifyScopesAndAuth(Scope.BROWSE, Scope.COMMENT_POST);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (deviationId == null || body == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		Map<String, String> postParams = new HashMap<String, String>();
+		postParams.put("body", body);
+		if (commentId != null) {
+			postParams.put("commentid", commentId);
+		}
+		JSONObject json = requestJSON(Verb.POST, createURL(ENDPOINTS.COMMENTS_POST_DEVIATION + deviationId, params), postParams);
+		try {
+			if (!json.has("error")) {
+				return new RespComment(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestCommentsPostProfile(String userName, String body) {
+		return requestCommentsPostProfile(userName, body, null);
+	}
+	public final Response requestCommentsPostProfile(String userName, String body, String commentId) {
+		Response respVerify = verifyScopesAndAuth(Scope.BROWSE, Scope.COMMENT_POST);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (userName == null || body == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		Map<String, String> postParams = new HashMap<String, String>();
+		postParams.put("body", body);
+		if (commentId != null) {
+			postParams.put("commentid", commentId);
+		}
+		JSONObject json = requestJSON(Verb.POST, createURL(ENDPOINTS.COMMENTS_POST_PROFILE + userName, params), postParams);
+		try {
+			if (!json.has("error")) {
+				return new RespComment(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestCommentsPostStatus(String statusId, String body) {
+		return requestCommentsPostStatus(statusId, body, null);
+	}
+	public final Response requestCommentsPostStatus(String statusId, String body, String commentId) {
+		Response respVerify = verifyScopesAndAuth(Scope.BROWSE, Scope.COMMENT_POST);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (statusId == null || body == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		Map<String, String> postParams = new HashMap<String, String>();
+		postParams.put("body", body);
+		if (commentId != null) {
+			postParams.put("commentid", commentId);
+		}
+		JSONObject json = requestJSON(Verb.POST, createURL(ENDPOINTS.COMMENTS_POST_STATUS + statusId, params), postParams);
+		try {
+			if (!json.has("error")) {
+				return new RespComment(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestCommentsProfile(String userName) {
+		return requestCommentsProfile(userName, null);
+	}
+	public final Response requestCommentsProfile(String userName, String commentId) {
+		return requestCommentsProfile(userName, commentId, -1);
+	}
+	public final Response requestCommentsProfile(String userName, String commentId, int maxDepth) {
+		return requestCommentsProfile(userName, commentId, maxDepth, -1, -1);
+	}
+	public final Response requestCommentsProfile(String userName, String commentId, int maxDepth, int offset, int limit) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (userName == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		if (commentId != null) {
+			params.put("commentid", commentId);
+		}
+		if (maxDepth != -1) {
+			params.put("maxdepth", maxDepth + "");
+		}
+		if (offset != -1) {
+			params.put("offset", offset + "");
+		}
+		if (limit != -1) {
+			params.put("limit", limit + "");
+		}
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.COMMENTS_PROFILE + userName, params));
+		try {
+			if (!json.has("error")) {
+				return new RespComments(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestCommentsSiblings(String commentId) {
+		return requestCommentsSiblings(commentId, -1);
+	}
+	public final Response requestCommentsSiblings(String commentId, int extItem) {
+		return requestCommentsSiblings(commentId, extItem, -1, -1);
+	}
+	public final Response requestCommentsSiblings(String commentId, int extItem, int offset, int limit) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (commentId == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		if (extItem != -1) {
+			params.put("ext_item", extItem + "");
+		}
+		if (offset != -1) {
+			params.put("offset", offset + "");
+		}
+		if (limit != -1) {
+			params.put("limit", limit + "");
+		}
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.COMMENTS + commentId + "/siblings", params));
+		try {
+			if (!json.has("error")) {
+				return new RespComments(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestCommentsStatus(String statusId) {
+		return requestCommentsStatus(statusId, null);
+	}
+	public final Response requestCommentsStatus(String statusId, String commentId) {
+		return requestCommentsStatus(statusId, commentId, -1);
+	}
+	public final Response requestCommentsStatus(String statusId, String commentId, int maxDepth) {
+		return requestCommentsStatus(statusId, commentId, maxDepth, -1, -1);
+	}
+	public final Response requestCommentsStatus(String statusId, String commentId, int maxDepth, int offset, int limit) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (statusId == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		if (commentId != null) {
+			params.put("commentid", commentId);
+		}
+		if (maxDepth != -1) {
+			params.put("maxdepth", maxDepth + "");
+		}
+		if (offset != -1) {
+			params.put("offset", offset + "");
+		}
+		if (limit != -1) {
+			params.put("limit", limit + "");
+		}
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.COMMENTS_STATUS + statusId, params));
+		try {
+			if (!json.has("error")) {
+				return new RespComments(json);
 			}
 			else {
 				return new RespError(json);
