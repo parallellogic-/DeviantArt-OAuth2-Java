@@ -8,8 +8,8 @@ public abstract class RespPaginationDelta<T> extends RespPagination<T> {
 	private int mNextOffset;
 	private boolean mReset;
 	
-	public RespPaginationDelta(JSONObject json) throws JSONException {
-		super(json, "entries");
+	public RespPaginationDelta(JSONObject json, String arrayName) throws JSONException {
+		super(json, arrayName);
 		mCursor = json.getString("cursor");
 		mNextOffset = json.optInt("next_offset");
 		mReset = json.getBoolean("reset");

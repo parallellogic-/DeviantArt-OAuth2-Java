@@ -26,8 +26,10 @@ import com.kimbrelk.da.oauth2.response.RespFeedNotifications;
 import com.kimbrelk.da.oauth2.response.RespFriends;
 import com.kimbrelk.da.oauth2.response.RespGallery;
 import com.kimbrelk.da.oauth2.response.RespGalleryFolders;
+import com.kimbrelk.da.oauth2.response.RespStashDelta;
 import com.kimbrelk.da.oauth2.response.RespStashMedia;
 import com.kimbrelk.da.oauth2.response.RespStashMetadata;
+import com.kimbrelk.da.oauth2.response.RespStashMoveFile;
 import com.kimbrelk.da.oauth2.response.RespStashPublishUserdata;
 import com.kimbrelk.da.oauth2.response.RespStashSpace;
 import com.kimbrelk.da.oauth2.response.RespUserDamntoken;
@@ -50,7 +52,7 @@ import java.util.Scanner;
 @SuppressWarnings("unused")
 public final class Main {
 	private final static ClientCredentials CREDENTIALS = new MyCredentials();
-	private final static AuthGrantType GRANT_TYPE = AuthGrantType.CLIENT_CREDENTIALS;
+	private final static AuthGrantType GRANT_TYPE = AuthGrantType.REFRESH_TOKEN;
 	private final static String URI_REDIRECT = "http://127.0.0.1/";
 	
 	public final static void main(String[] args) {
@@ -140,13 +142,19 @@ public final class Main {
 			//demoGallery(oAuth2);
 			//demoGalleryFolder(oAuth2);
 			
+			// Group Demos
+			//demoGroupSuggestFave(oAuth2);
+			
 			// Sta.sh Demos
 			// TODO
 			//demoStashDelete(oAuth2);
+			//demoStashDelta(oAuth2);
 			//demoStashFolder(oAuth2);
 			//demoStashMedia(oAuth2);
-			demoStashMetadata(oAuth2);
+			//demoStashMetadata(oAuth2);
 			//demoStashMetadataFolder(oAuth2);
+			//demoStashMoveFile(oAuth2);
+			//demoStashMoveFolder(oAuth2);
 			//demoStashPublishCategorytree(oAuth2);
 			//demoStashPublishUserdata(oAuth2);
 			//demoStashSpace(oAuth2);
@@ -612,12 +620,36 @@ public final class Main {
 		System.out.println();
 	}
 	
+	private final static void demoGroupSuggestFave(OAuth2 oAuth2) {
+		System.out.println("demoGroupSuggestFave()");
+		Response resp = oAuth2.requestGroupSuggestFave("48EB2341-8862-4D88-C38D-5567AAD334BA", "botlab", "6B8F2EE1-D510-AD8D-C3A8-5A320F31401E");
+		if (resp.isSuccess()) {
+			System.out.println("Suggested fave to botlab.");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	
 	private final static void demoStashDelete(OAuth2 oAuth2) {
 		System.out.println("demoStashDelete()");
 		Response resp;
 		resp = oAuth2.requestStashDelete(8822652551090346L);
 		if (resp.isSuccess()) {
 			System.out.println("Successfully deleted file.");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoStashDelta(OAuth2 oAuth2) {
+		System.out.println("demoStashDelta()");
+		Response resp;
+		resp = oAuth2.requestStashDelta();
+		if (resp.isSuccess()) {
+			System.out.println("First stash item/folder name: " + ((RespStashDelta)resp).getResults()[0].getMetadata().getTitle());
 		}
 		else {
 			System.out.println(resp);
@@ -666,6 +698,30 @@ public final class Main {
 		resp = oAuth2.requestStashMetadataFolder(6863479255399202L);
 		if (resp.isSuccess()) {
 			System.out.println("Stash folder name: " + ((RespStashMetadata)resp).getMetadata().getTitle());
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoStashMoveFile(OAuth2 oAuth2) {
+		System.out.println("demoStashMoveFile()");
+		Response resp;
+		resp = oAuth2.requestStashMoveFile(4784739373778459L, "Folder Name");
+		if (resp.isSuccess()) {
+			System.out.println("Moved stash item to a new folder.");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoStashMoveFolder(OAuth2 oAuth2) {
+		System.out.println("demoStashMoveFolder()");
+		Response resp;
+		resp = oAuth2.requestStashMoveFolderPosition(4171151214390062L, 1);
+		if (resp.isSuccess()) {
+			System.out.println("Moved folder position.");
 		}
 		else {
 			System.out.println(resp);

@@ -24,9 +24,12 @@ import com.kimbrelk.da.oauth2.response.RespFriends;
 import com.kimbrelk.da.oauth2.response.RespGallery;
 import com.kimbrelk.da.oauth2.response.RespGalleryFolders;
 import com.kimbrelk.da.oauth2.response.RespStashDelete;
+import com.kimbrelk.da.oauth2.response.RespStashDelta;
 import com.kimbrelk.da.oauth2.response.RespStashFolder;
 import com.kimbrelk.da.oauth2.response.RespStashMedia;
 import com.kimbrelk.da.oauth2.response.RespStashMetadata;
+import com.kimbrelk.da.oauth2.response.RespStashMoveFile;
+import com.kimbrelk.da.oauth2.response.RespStashMoveFolder;
 import com.kimbrelk.da.oauth2.response.RespStashPublishUserdata;
 import com.kimbrelk.da.oauth2.response.RespStashSpace;
 import com.kimbrelk.da.oauth2.response.RespToken;
@@ -1463,6 +1466,34 @@ public final class OAuth2 {
 		}
 	}
 	
+	public final Response requestGroupSuggestFave(String deviationId, String groupName, String folderId) {
+		Response respVerify = verifyScopesAndAuth(Scope.GROUP);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (deviationId == null || groupName == null || folderId == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		params.put("deviationid", deviationId);
+		params.put("group", groupName);
+		params.put("folderid", folderId);
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.GROUP_SUGGEST_FAVE, params));
+		try {
+			if (!json.has("error")) {
+				return new RespStashMoveFolder(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 	public final Response requestStashDelete(long stashId) {
 		Response respVerify = verifyScopesAndAuth(Scope.STASH);
 		if (respVerify.isError()) {
@@ -1478,6 +1509,42 @@ public final class OAuth2 {
 		try {
 			if (!json.has("error")) {
 				return new RespStashDelete(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestStashDelta() {
+		return requestStashDelta(null);
+	}
+	public final Response requestStashDelta(String cursor) {
+		return requestStashDelta(cursor, -1, -1);
+	}
+	public final Response requestStashDelta(String cursor, int offset, int limit) {
+		Response respVerify = verifyScopesAndAuth(Scope.STASH);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		if (cursor != null) {
+			params.put("cursor", cursor);
+		}
+		if (offset != -1) {
+			params.put("offset", offset+"");
+		}
+		if (limit != -1) {
+			params.put("limit", limit+"");
+		}
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.STASH_DELTA, params));
+		try {
+			if (!json.has("error")) {
+				return new RespStashDelta(json);
 			}
 			else {
 				return new RespError(json);
@@ -1601,6 +1668,95 @@ public final class OAuth2 {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	public final Response requestStashMoveFile(long stashId, String folderName) {
+		return requestStashMoveFile(stashId, -1, folderName, -1);
+	}
+	public final Response requestStashMoveFile(long stashId, long folderId) {
+		return requestStashMoveFile(stashId, folderId, -1);
+	}
+	public final Response requestStashMoveFile(long stashId, long folderId, int position) {
+		return requestStashMoveFile(stashId, folderId, null, position);
+	}
+	public final Response requestStashMoveFile(long stashId, long folderId, String folderName, int position) {
+		Response respVerify = verifyScopesAndAuth(Scope.STASH);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (stashId == -1) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		params.put("stashid", stashId + "");
+		if (folderId != -1) {
+			params.put("folderid", folderId + "");
+		}
+		if (folderName != null) {
+			params.put("folder", folderName);
+		}
+		if (position != -1) {
+			params.put("position", position + "");
+		}
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.STASH_MOVE_FILE, params));
+		try {
+			if (!json.has("error")) {
+				return new RespStashMoveFile(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestStashMoveFilePosition(long stashId, int position) {
+		return requestStashMoveFile(stashId, -1, null, position);
+	}
+	public final Response requestStashMoveFolder(long folderId, long targetId) {
+		return requestStashMoveFolder(folderId, targetId, -1);
+	}
+	public final Response requestStashMoveFolder(long folderId, long targetId, int position) {
+		return requestStashMoveFolder(folderId, targetId, position);
+	}
+	public final Response requestStashMoveFolder(long folderId, long targetId, String folderName, int position) {
+		Response respVerify = verifyScopesAndAuth(Scope.STASH);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (folderId == -1) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		params.put("folderid", folderId + "");
+		if (targetId != -1) {
+			params.put("targetid", targetId + "");
+		}
+		if (folderName != null) {
+			params.put("folder", folderName);
+		}
+		if (position != -1) {
+			params.put("position", position + "");
+		}
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.STASH_MOVE_FOLDER, params));
+		try {
+			if (!json.has("error")) {
+				return new RespStashMoveFolder(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestStashMoveFolderPosition(long folderId, int position) {
+		return requestStashMoveFolder(folderId, -1, null, position);
 	}
 	public final Response requestStashPublishCategorytree() {
 		return requestStashPublishCategorytree("/");
