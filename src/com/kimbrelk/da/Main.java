@@ -30,8 +30,10 @@ import com.kimbrelk.da.oauth2.response.RespStashDelta;
 import com.kimbrelk.da.oauth2.response.RespStashMedia;
 import com.kimbrelk.da.oauth2.response.RespStashMetadata;
 import com.kimbrelk.da.oauth2.response.RespStashMoveFile;
+import com.kimbrelk.da.oauth2.response.RespStashPublish;
 import com.kimbrelk.da.oauth2.response.RespStashPublishUserdata;
 import com.kimbrelk.da.oauth2.response.RespStashSpace;
+import com.kimbrelk.da.oauth2.response.RespStashSubmit;
 import com.kimbrelk.da.oauth2.response.RespUserDamntoken;
 import com.kimbrelk.da.oauth2.response.RespUserFriends;
 import com.kimbrelk.da.oauth2.response.RespUserFriendsWatching;
@@ -45,6 +47,8 @@ import com.kimbrelk.da.oauth2.response.Response;
 import com.kimbrelk.da.oauth2.struct.ArtistLevel;
 import com.kimbrelk.da.oauth2.struct.ArtistSpeciality;
 import com.kimbrelk.da.oauth2.struct.GalleryMode;
+import com.kimbrelk.da.oauth2.struct.License;
+import com.kimbrelk.da.oauth2.struct.Maturity;
 import com.kimbrelk.da.oauth2.struct.TimeRange;
 import com.kimbrelk.da.oauth2.struct.Watch;
 import java.util.Scanner;
@@ -146,7 +150,6 @@ public final class Main {
 			//demoGroupSuggestFave(oAuth2);
 			
 			// Sta.sh Demos
-			// TODO
 			//demoStashDelete(oAuth2);
 			//demoStashDelta(oAuth2);
 			//demoStashFolder(oAuth2);
@@ -155,9 +158,11 @@ public final class Main {
 			//demoStashMetadataFolder(oAuth2);
 			//demoStashMoveFile(oAuth2);
 			//demoStashMoveFolder(oAuth2);
+			//demoStashPublish(oAuth2);
 			//demoStashPublishCategorytree(oAuth2);
 			//demoStashPublishUserdata(oAuth2);
 			//demoStashSpace(oAuth2);
+			demoStashSubmit(oAuth2);
 			
 			// User Demos
 			//demoUserDamntoken(oAuth2);
@@ -622,7 +627,8 @@ public final class Main {
 	
 	private final static void demoGroupSuggestFave(OAuth2 oAuth2) {
 		System.out.println("demoGroupSuggestFave()");
-		Response resp = oAuth2.requestGroupSuggestFave("48EB2341-8862-4D88-C38D-5567AAD334BA", "botlab", "6B8F2EE1-D510-AD8D-C3A8-5A320F31401E");
+		oAuth2.requestGroupFolders("botlab");
+		Response resp = oAuth2.requestGroupSuggestFave("48EB2341-8862-4D88-C38D-5567AAD334BA", "botlab", "102C6190-93E6-711C-AD1C-1009EB150922");
 		if (resp.isSuccess()) {
 			System.out.println("Suggested fave to botlab.");
 		}
@@ -728,6 +734,18 @@ public final class Main {
 		}
 		System.out.println();
 	}
+	private final static void demoStashPublish(OAuth2 oAuth2) {
+		System.out.println("demoStashPublish()");
+		Response resp = oAuth2.requestStashPublish(2615503446898423L, null, false, false);
+		if (resp.isSuccess()) {
+			System.out.println("Published deviation's URL: \"" + 
+				((RespStashPublish)resp).getURL() + "\"");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
 	private final static void demoStashPublishCategorytree(OAuth2 oAuth2) {
 		System.out.println("demoStashPublishCategorytree()");
 		Response resp = oAuth2.requestStashPublishCategorytree("/", "png");
@@ -766,7 +784,19 @@ public final class Main {
 		}
 		System.out.println();
 	}
-
+	private final static void demoStashSubmit(OAuth2 oAuth2) {
+		System.out.println("demoStashSubmit()");
+		Response resp = oAuth2.requestStashSubmit(null);
+		if (resp.isSuccess()) {
+			System.out.println("Submitted stash item: \"http://sta.sh/1" + 
+				((RespStashSubmit)resp).getStashId() + "\"");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	
 	private final static void demoUserDamntoken(OAuth2 oAuth2) {
 		System.out.println("demoUserDamntoken()");
 		Response resp;

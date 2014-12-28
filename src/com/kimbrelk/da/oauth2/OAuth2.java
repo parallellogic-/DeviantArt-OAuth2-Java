@@ -30,8 +30,10 @@ import com.kimbrelk.da.oauth2.response.RespStashMedia;
 import com.kimbrelk.da.oauth2.response.RespStashMetadata;
 import com.kimbrelk.da.oauth2.response.RespStashMoveFile;
 import com.kimbrelk.da.oauth2.response.RespStashMoveFolder;
+import com.kimbrelk.da.oauth2.response.RespStashPublish;
 import com.kimbrelk.da.oauth2.response.RespStashPublishUserdata;
 import com.kimbrelk.da.oauth2.response.RespStashSpace;
+import com.kimbrelk.da.oauth2.response.RespStashSubmit;
 import com.kimbrelk.da.oauth2.response.RespToken;
 import com.kimbrelk.da.oauth2.response.RespUserDamntoken;
 import com.kimbrelk.da.oauth2.response.RespUserFriends;
@@ -44,11 +46,16 @@ import com.kimbrelk.da.oauth2.response.RespUserWatchers;
 import com.kimbrelk.da.oauth2.response.RespUserWhoami;
 import com.kimbrelk.da.oauth2.response.RespUserWhois;
 import com.kimbrelk.da.oauth2.response.Response;
+import com.kimbrelk.da.oauth2.struct.DisplayResolution;
 import com.kimbrelk.da.oauth2.struct.GalleryMode;
+import com.kimbrelk.da.oauth2.struct.License;
+import com.kimbrelk.da.oauth2.struct.Maturity;
+import com.kimbrelk.da.oauth2.struct.Share;
 import com.kimbrelk.da.oauth2.struct.User;
 import com.kimbrelk.da.oauth2.struct.Watch;
 import com.kimbrelk.da.oauth2.struct.Whois;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -1466,6 +1473,32 @@ public final class OAuth2 {
 		}
 	}
 	
+	public final Response requestGroupFolders(String groupName) {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (groupName == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		params.put("group", groupName);
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.GROUP_FOLDERS, params));
+		try {
+			System.out.println(json.toString(5));
+			if (!json.has("error")) {
+				return new Response();
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 	public final Response requestGroupSuggestFave(String deviationId, String groupName, String folderId) {
 		Response respVerify = verifyScopesAndAuth(Scope.GROUP);
 		if (respVerify.isError()) {
@@ -1758,6 +1791,68 @@ public final class OAuth2 {
 	public final Response requestStashMoveFolderPosition(long folderId, int position) {
 		return requestStashMoveFolder(folderId, -1, null, position);
 	}
+	public final Response requestStashPublish(long stashId, Maturity maturity, boolean agreeToS, boolean agreeSubmissionPolicy) {
+		return requestStashPublish(stashId, maturity, null, null, null, true, true, false, DisplayResolution.ORIGINAL, false, false, agreeToS, agreeSubmissionPolicy);
+	}
+	public final Response requestStashPublish(long stashId, Maturity maturity, License license, Share share, String catPath, boolean feature, boolean allowComments, boolean requestCritique, int displayResolution, boolean freeDownload, boolean addWatermark, boolean agreeToS, boolean agreeSubmissionPolicy) {
+		Response respVerify = verifyScopesAndAuth(Scope.STASH, Scope.PUBLISH);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (stashId == -1) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		Map<String, String> paramsPost = new HashMap<String, String>();
+		paramsPost.put("stashid", stashId + "");
+		if (maturity == null || maturity.getLevel() == Maturity.Level.NONE) {
+			paramsPost.put("is_mature", "false");
+		}
+		else {
+			paramsPost.put("is_mature", "true");
+			paramsPost.put("mature_level", maturity.getLevel().toString().toLowerCase());
+			int a=0;
+			for(Maturity.Classification classification: maturity.getClassifications()) {
+				paramsPost.put("mature_classification[" + a + "]", classification.toString().toLowerCase());
+				a++;
+			}
+		}
+		if (license != null) {
+			paramsPost.put("license_options[creative_commons]", license.allowsAttribution() + "");
+			paramsPost.put("license_options[commercial]", license.allowsCommercialUse() + "");
+			paramsPost.put("license_options[modify ]", license.allowsModification() + "");
+		}
+		if (catPath != null) {
+			paramsPost.put("catpath", catPath);
+		}
+		if (share != null) {
+			paramsPost.put("share", share.toString().toLowerCase() + "");
+		}
+		if (displayResolution != -1) {
+			paramsPost.put("display_resolution", displayResolution + "");
+			paramsPost.put("add_watermark", addWatermark + "");
+		}
+		paramsPost.put("allow_comments", allowComments + "");
+		paramsPost.put("feature", feature + "");
+		paramsPost.put("request_critique", requestCritique + "");
+		paramsPost.put("allow_free_download", freeDownload + "");
+		paramsPost.put("agree_tos", agreeToS + "");
+		paramsPost.put("agree_submission", agreeSubmissionPolicy + "");
+		JSONObject json = requestJSON(Verb.POST, createURL(ENDPOINTS.STASH_PUBLISH, params), paramsPost);
+		try {
+			if (!json.has("error")) {
+				return new RespStashPublish(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 	public final Response requestStashPublishCategorytree() {
 		return requestStashPublishCategorytree("/");
 	}
@@ -1824,6 +1919,59 @@ public final class OAuth2 {
 		try {
 			if (!json.has("error")) {
 				return new RespStashSpace(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestStashSubmit(File file) {
+		return requestStashSubmit(file, null, null, null, -1, null, -1, false);
+	}
+	public final Response requestStashSubmit(File file, String title, String description, String originalURL, long stashId, String folder, long folderId, boolean isDirty, String... tags) {
+		Response respVerify = verifyScopesAndAuth(Scope.STASH);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		if (file == null) {
+			return RespError.INVALID_REQUEST;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		Map<String, String> paramsPost = new HashMap<String, String>();
+		if (title != null) {
+			paramsPost.put("title", title);
+		}
+		if (description != null) {
+			paramsPost.put("artist_comments", description);
+		}
+		if (originalURL != null) {
+			paramsPost.put("original_url", originalURL);
+		}
+		if (stashId != -1) {
+			paramsPost.put("stashid", stashId + "");
+		}
+		if (folderId != -1) {
+			paramsPost.put("folderid", folderId + "");
+		}
+		if (folder != null) {
+			paramsPost.put("folder", folder);
+		}
+		paramsPost.put("is_dirty", isDirty + "");
+		int a = 0;
+		for(String tag: tags) {
+			paramsPost.put("tags[" + a + "]", tag);
+			a++;
+		}
+		
+		JSONObject json = requestJSON(Verb.POST, createURL(ENDPOINTS.STASH_SUBMIT, params), paramsPost);
+		try {
+			if (!json.has("error")) {
+				return new RespStashSubmit(json);
 			}
 			else {
 				return new RespError(json);

@@ -49,6 +49,7 @@ public final class Endpoints_v1 extends Endpoints {
 	public final static String GALLERY_FOLDERS = 			GALLERY + "folders";
 
 	private final static String GROUP = 					PREFIX_ENDPOINT + "group/";
+	public final static String GROUP_FOLDERS = 				GROUP + "folders";
 	private final static String GROUP_SUGGEST = 			GROUP + "suggest/";
 	public final static String GROUP_SUGGEST_FAVE = 		GROUP_SUGGEST + "fave";
 	
