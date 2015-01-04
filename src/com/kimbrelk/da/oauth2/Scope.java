@@ -7,7 +7,6 @@ public enum Scope {
 	COLLECTION,
 	COMMENT_POST,
 	FEED,
-	GROUP,
 	PUBLISH,
 	STASH,
 	USER,

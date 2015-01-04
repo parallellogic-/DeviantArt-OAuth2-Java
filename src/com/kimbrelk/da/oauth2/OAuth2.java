@@ -56,6 +56,7 @@ import com.kimbrelk.da.oauth2.struct.Watch;
 import com.kimbrelk.da.oauth2.struct.Whois;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -176,16 +177,22 @@ public final class OAuth2 {
 	}
 	
 	public final Response requestAuthRevoke() {
-		Response respVerify = verifyScopesAndAuth();
+		Response respVerify = verifyScopesAndAuth(true);
 		if (respVerify.isError()) {
 			return respVerify;
 		}
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("access_token", mToken.getToken());
-		params.put("token", mToken.getToken());
-		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.OAUTH2_REVOKE, params));
+		Map<String, String> postParams = new HashMap<String, String>();
+		if (hasRefreshToken()) {
+			postParams.put("token", mToken.getRefreshToken());
+		}
+		else {
+			postParams.put("token", mToken.getToken());
+		}
+		JSONObject json = requestJSON(Verb.POST, createURL(ENDPOINTS.OAUTH2_REVOKE, params), postParams);
 		try {
-			if (json.getString("status").equalsIgnoreCase("success")) {
+			if (json.getBoolean("success")) {
 				return new Response();
 			}
 			else {
@@ -246,7 +253,13 @@ public final class OAuth2 {
 					String[] parse = json.getString("scope").replace(".", "_").toUpperCase().split("[ ]+");
 					Scope scopes[] = new Scope[parse.length];
 					for(int a=0; a<parse.length; a++) {
-						scopes[a] = Scope.valueOf(parse[a]);
+						try {
+							scopes[a] = Scope.valueOf(parse[a]);
+						}
+						catch (IllegalArgumentException e) {
+							scopes[a] = null;
+							e.printStackTrace();
+						}
 					}
 					response = new RespToken(
 							json.getInt("expires_in"), 
@@ -828,6 +841,12 @@ public final class OAuth2 {
 			}
 		}
 		catch (JSONException e) {
+			try {
+				System.out.println(json.toString(5));
+			}
+			catch (JSONException e1) {
+				e1.printStackTrace();
+			}
 			e.printStackTrace();
 			return null;
 		}
@@ -1473,60 +1492,6 @@ public final class OAuth2 {
 		}
 	}
 	
-	public final Response requestGroupFolders(String groupName) {
-		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
-		if (respVerify.isError()) {
-			return respVerify;
-		}
-		if (groupName == null) {
-			return RespError.INVALID_REQUEST;
-		}
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("access_token", mToken.getToken());
-		params.put("group", groupName);
-		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.GROUP_FOLDERS, params));
-		try {
-			System.out.println(json.toString(5));
-			if (!json.has("error")) {
-				return new Response();
-			}
-			else {
-				return new RespError(json);
-			}
-		}
-		catch (JSONException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-	public final Response requestGroupSuggestFave(String deviationId, String groupName, String folderId) {
-		Response respVerify = verifyScopesAndAuth(Scope.GROUP);
-		if (respVerify.isError()) {
-			return respVerify;
-		}
-		if (deviationId == null || groupName == null || folderId == null) {
-			return RespError.INVALID_REQUEST;
-		}
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("access_token", mToken.getToken());
-		params.put("deviationid", deviationId);
-		params.put("group", groupName);
-		params.put("folderid", folderId);
-		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.GROUP_SUGGEST_FAVE, params));
-		try {
-			if (!json.has("error")) {
-				return new RespStashMoveFolder(json);
-			}
-			else {
-				return new RespError(json);
-			}
-		}
-		catch (JSONException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-	
 	public final Response requestStashDelete(long stashId) {
 		Response respVerify = verifyScopesAndAuth(Scope.STASH);
 		if (respVerify.isError()) {
@@ -1968,6 +1933,7 @@ public final class OAuth2 {
 			a++;
 		}
 		
+		// TODO
 		JSONObject json = requestJSON(Verb.POST, createURL(ENDPOINTS.STASH_SUBMIT, params), paramsPost);
 		try {
 			if (!json.has("error")) {
@@ -2429,7 +2395,7 @@ public final class OAuth2 {
 		params.put("access_token", mToken.getToken());
 		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.UTIL_PLACEBO, params));
 		try {
-			if (json.getString("status").equalsIgnoreCase("success")) {
+			if (json.has("status") && json.getString("status").equalsIgnoreCase("success")) {
 				return new Response();
 			}
 			else {
@@ -2524,6 +2490,16 @@ public final class OAuth2 {
 					catch (Exception err) {
 						
 					}
+					try {
+						if (connection.getResponseCode() == 403 || connection.getResponseCode() == 429) {
+							json.put("error_description", RespError.RATE_LIMIT.getDescription());
+							json.put("error", RespError.RATE_LIMIT.getType());
+							return json;
+						}
+					}
+					catch(IOException er) {
+						
+					}
 					String str = "";
 					str += "URL: " + url.split("[?]+")[0] + "\n";
 					//str += "POST Data: " + postData + "\n";
@@ -2532,6 +2508,7 @@ public final class OAuth2 {
 						str += connection.getHeaderFieldKey(a) + ": " + connection.getHeaderField(a) + "\n";
 					}
 					json.put("error_description", str);
+					json.put("error", RespError.REQUEST_FAILED.getType());
 					return json;
 				}
 				catch (Exception er) {

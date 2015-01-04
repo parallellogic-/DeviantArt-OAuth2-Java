@@ -46,17 +46,26 @@ import com.kimbrelk.da.oauth2.response.RespUserWhois;
 import com.kimbrelk.da.oauth2.response.Response;
 import com.kimbrelk.da.oauth2.struct.ArtistLevel;
 import com.kimbrelk.da.oauth2.struct.ArtistSpeciality;
+import com.kimbrelk.da.oauth2.struct.Comment;
+import com.kimbrelk.da.oauth2.struct.Deviation;
+import com.kimbrelk.da.oauth2.struct.DeviationMetadata;
 import com.kimbrelk.da.oauth2.struct.GalleryMode;
 import com.kimbrelk.da.oauth2.struct.License;
 import com.kimbrelk.da.oauth2.struct.Maturity;
 import com.kimbrelk.da.oauth2.struct.TimeRange;
 import com.kimbrelk.da.oauth2.struct.Watch;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Scanner;
 
 @SuppressWarnings("unused")
 public final class Main {
 	private final static ClientCredentials CREDENTIALS = new MyCredentials();
-	private final static AuthGrantType GRANT_TYPE = AuthGrantType.REFRESH_TOKEN;
+	private final static AuthGrantType GRANT_TYPE = AuthGrantType.AUTHORIZATION_CODE;
 	private final static String URI_REDIRECT = "http://127.0.0.1/";
 	
 	public final static void main(String[] args) {
@@ -96,7 +105,13 @@ public final class Main {
 			
 			// Auth Demos
 			demoAuthGetTokens(oAuth2);
+			//demoUtilPlacebo(oAuth2);
 			//demoAuthRevoke(oAuth2);	// /revoke is broken on dA's side at this time.
+			//demoUtilPlacebo(oAuth2);
+
+			// Super Demos
+			demo429(oAuth2);
+			//demoAllComments(oAuth2);
 			
 			// Browse Demos
 			//demoBrowseCategorytree(oAuth2);
@@ -162,7 +177,7 @@ public final class Main {
 			//demoStashPublishCategorytree(oAuth2);
 			//demoStashPublishUserdata(oAuth2);
 			//demoStashSpace(oAuth2);
-			demoStashSubmit(oAuth2);
+			//demoStashSubmit(oAuth2);
 			
 			// User Demos
 			//demoUserDamntoken(oAuth2);
@@ -185,6 +200,127 @@ public final class Main {
 		}
 		
 		in.close();
+	}
+	
+	private final static void demo429(OAuth2 oAuth2) {
+		System.out.println("demo429()");
+		Response resp;
+		long timeStart = System.currentTimeMillis();
+		int num = 0;
+		do {
+			resp = oAuth2.requestUserDamntoken();
+			num++;
+		} while(!(resp instanceof RespError));
+		long timeEnd = System.currentTimeMillis();
+		System.out.println((RespError)resp);
+		System.out.println(num + " successful requests in " + ((timeEnd - timeStart) / 1000.0) + " seconds before rate limited.");
+	}
+	
+	/**
+	 * This demo will get all comments that are level 5 comments and lower for the second most popular deviation on dA of all time.
+	 * @param oAuth2
+	 */
+	private final static void demoAllComments(OAuth2 oAuth2) {
+		System.out.println("demoAllComments()");
+		
+		// Request the second most popular deviation of all time
+		Response resp = oAuth2.requestBrowsePopular(null, null, 1, 1, TimeRange.ALLTIME);
+		if (resp.isSuccess()) {
+			if (resp.isSuccess() && ((RespDeviationsQuery)resp).getResults().length > 0) {
+				Deviation deviation = ((RespDeviationsQuery)resp).getResults()[0];
+				System.out.println("\"" + deviation.getTitle() + "\" by " + deviation.getAuthor().getName() + " ( " + deviation.getURL() + " )");
+				resp = oAuth2.requestDeviationMetadata(deviation.getId());
+				if (resp.isSuccess() && ((RespDeviationMetadata)resp).getResults().length > 0) {
+					
+					// Request the metadata of the deviation
+					DeviationMetadata metadata = ((RespDeviationMetadata)resp).getResults()[0];
+					System.out.println(metadata.getDescription());
+					
+					// Generate the comment map
+					Map<String, AllCommentsItem> commentMap = new HashMap<String, AllCommentsItem>();
+					List<AllCommentsItem> commentItems = new ArrayList<AllCommentsItem>();
+					int curOffset = 0;
+					final int LIMIT = 50;
+					do {
+						System.out.println(deviation.getId() + " " + curOffset);
+						resp = oAuth2.requestCommentsDeviation(deviation.getId(), null, 5, curOffset, LIMIT);
+						if (resp instanceof RespComments) {
+							for(Comment comment: ((RespComments)resp).getResults()) {
+								int commentLevel = 0;
+								if (comment.getParentId() != null) {
+									try {
+										commentLevel = commentMap.get(comment.getParentId()).getCommentLevel() + 1;
+									}
+									catch(Exception e) {
+										System.out.println("Invalid parent: " + comment.getParentId());
+									}
+								}
+								AllCommentsItem item = new AllCommentsItem(commentLevel, comment);
+								commentMap.put(comment.getId(), item);
+								commentItems.add(item);
+							}
+							curOffset += LIMIT;
+							if (!((RespComments)resp).hasMore()) {
+								curOffset = -1;
+							}
+						}
+						else {
+							System.out.println(((RespError)resp).toString());
+							//return;
+						}
+					} while(curOffset != -1);
+					commentMap = null;
+					for(AllCommentsItem commentItem: commentItems) {
+						Comment comment = commentItem.getComment();
+						String commentText = "";
+						for(int a=0; a<=commentItem.getCommentLevel(); a++) {
+							commentText += " >";
+						}
+						commentText += " " + comment.getBody() + " [ by " + comment.getUser().getName() + " ]";
+					}
+				}
+				else {
+					System.out.println("Unable to get deviation metadata.");
+				}
+			}
+			else {
+				System.out.println("0 popular deviations found.");
+			}
+		}
+		else {
+			System.out.println("Unable to get second most popular deviation.");
+		}
+		System.out.println();
+	}
+	private final static class AllCommentsItem implements Comparable<AllCommentsItem> {
+		private int mCommentLevel;
+		private Comment mComment;
+		
+		public AllCommentsItem(int commentLevel, Comment comment) {
+			mCommentLevel = commentLevel;
+			mComment = comment;
+		}
+		
+		@Override
+		public final int compareTo(AllCommentsItem o) {
+			if (mCommentLevel > o.getCommentLevel()) {
+				return 1;
+			}
+			else if (mCommentLevel < o.getCommentLevel()) {
+				return -1;
+			}
+			else {
+				return 0;
+			}
+		}
+		
+		public final Comment getComment() {
+			return mComment;
+		}
+		
+		public final int getCommentLevel() {
+			return mCommentLevel;
+		}
 	}
 	
 	private final static void demoAuthGetTokens(OAuth2 oAuth2) {
@@ -618,19 +754,6 @@ public final class Main {
 		if (resp.isSuccess()) {
 			System.out.println("baronbeandip's first gallery folder name and id: \"" + 
 				((RespGalleryFolders)resp).getFolders()[0].getName() + " : " + ((RespGalleryFolders)resp).getFolders()[0].getId() + "\"");
-		}
-		else {
-			System.out.println(resp);
-		}
-		System.out.println();
-	}
-	
-	private final static void demoGroupSuggestFave(OAuth2 oAuth2) {
-		System.out.println("demoGroupSuggestFave()");
-		oAuth2.requestGroupFolders("botlab");
-		Response resp = oAuth2.requestGroupSuggestFave("48EB2341-8862-4D88-C38D-5567AAD334BA", "botlab", "102C6190-93E6-711C-AD1C-1009EB150922");
-		if (resp.isSuccess()) {
-			System.out.println("Suggested fave to botlab.");
 		}
 		else {
 			System.out.println(resp);

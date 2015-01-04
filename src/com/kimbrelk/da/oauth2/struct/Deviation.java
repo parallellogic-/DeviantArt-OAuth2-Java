@@ -129,7 +129,7 @@ public final class Deviation {
 	public final String getURL() {
 		return mURL;
 	}
-	public final String getUUID() {
+	public final String getId() {
 		return mUUID;
 	}
 	public final Video[] getVideos() {

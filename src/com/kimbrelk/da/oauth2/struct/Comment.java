@@ -18,6 +18,9 @@ public final class Comment {
 		mTimePosted = Util.stringToDate(json.getString("posted"));
 		mId = json.getString("commentid");
 		mParentId = json.optString("parentid");
+		if (mParentId.equals("")) {
+			mParentId = null;
+		}
 		mReplies = json.getInt("replies");
 		mUser = new User(json.getJSONObject("user"));
 	}

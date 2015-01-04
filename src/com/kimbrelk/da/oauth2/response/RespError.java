@@ -3,7 +3,6 @@ package com.kimbrelk.da.oauth2.response;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -13,6 +12,7 @@ public final class RespError extends Response {
 	public final static RespError INVALID_REQUEST = new RespError("invalid_request", "Request field validation failed.");
 	public final static RespError INVALID_TOKEN = new RespError("invalid_request", "Expired oAuth2 user token. The client should request a new one with an access code or a refresh token.");
 	public final static RespError NO_AUTH = new RespError("no_auth", "The client does not have an access_token.");
+	public final static RespError RATE_LIMIT = new RespError("rate_limit", "Rate limit reached or service overloaded.");
 	public final static RespError REQUEST_FAILED = new RespError("request_failed", "The client failed to make the request.");
 	
 	protected String mDesc;
