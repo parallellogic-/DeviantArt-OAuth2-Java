@@ -34,6 +34,7 @@ import com.kimbrelk.da.oauth2.response.RespStashPublish;
 import com.kimbrelk.da.oauth2.response.RespStashPublishUserdata;
 import com.kimbrelk.da.oauth2.response.RespStashSpace;
 import com.kimbrelk.da.oauth2.response.RespStashSubmit;
+import com.kimbrelk.da.oauth2.response.RespUser;
 import com.kimbrelk.da.oauth2.response.RespUserDamntoken;
 import com.kimbrelk.da.oauth2.response.RespUserFriends;
 import com.kimbrelk.da.oauth2.response.RespUserFriendsWatching;
@@ -41,8 +42,7 @@ import com.kimbrelk.da.oauth2.response.RespUserProfile;
 import com.kimbrelk.da.oauth2.response.RespUserStatus;
 import com.kimbrelk.da.oauth2.response.RespUserStatuses;
 import com.kimbrelk.da.oauth2.response.RespUserWatchers;
-import com.kimbrelk.da.oauth2.response.RespUserWhoami;
-import com.kimbrelk.da.oauth2.response.RespUserWhois;
+import com.kimbrelk.da.oauth2.response.RespUsers;
 import com.kimbrelk.da.oauth2.response.Response;
 import com.kimbrelk.da.oauth2.struct.ArtistLevel;
 import com.kimbrelk.da.oauth2.struct.ArtistSpeciality;
@@ -54,7 +54,6 @@ import com.kimbrelk.da.oauth2.struct.License;
 import com.kimbrelk.da.oauth2.struct.Maturity;
 import com.kimbrelk.da.oauth2.struct.TimeRange;
 import com.kimbrelk.da.oauth2.struct.Watch;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -110,7 +109,7 @@ public final class Main {
 			//demoUtilPlacebo(oAuth2);
 
 			// Super Demos
-			demo429(oAuth2);
+			//demo429(oAuth2);
 			//demoAllComments(oAuth2);
 			
 			// Browse Demos
@@ -192,8 +191,8 @@ public final class Main {
 			//demoUserStatusPost(oAuth2);
 			//demoUserStatuses(oAuth2);
 			//demoUserWatchers(oAuth2);
-			//demoUserWhoami(oAuth2);
-			//demoUserWhois(oAuth2);
+			demoUserWhoami(oAuth2);
+			demoUserWhois(oAuth2);
 			
 			// Util Demos
 			//demoUtilPlacebo(oAuth2);
@@ -265,8 +264,9 @@ public final class Main {
 							}
 						}
 						else {
-							System.out.println(((RespError)resp).toString());
+							//System.out.println(((RespError)resp).toString());
 							//return;
+							for(long a=0; a<5000000000L; a++) {}
 						}
 					} while(curOffset != -1);
 					commentMap = null;
@@ -276,7 +276,8 @@ public final class Main {
 						for(int a=0; a<=commentItem.getCommentLevel(); a++) {
 							commentText += " >";
 						}
-						commentText += " " + comment.getBody() + " [ by " + comment.getUser().getName() + " ]";
+						commentText += " " + comment.getUser().getName() + ": " + comment.getBody().replace("\n", " ");
+						System.out.println(commentText);
 					}
 				}
 				else {
@@ -1076,7 +1077,7 @@ public final class Main {
 		Response resp;
 		resp = oAuth2.requestUserWhoami();
 		if (resp.isSuccess()) {
-			System.out.println("Your username is " + ((RespUserWhoami)resp).getUser().getName() + ".");
+			System.out.println("Your username is " + ((RespUser)resp).getUser().getName() + ".");
 		}
 		else {
 			System.out.println(resp);
@@ -1087,9 +1088,9 @@ public final class Main {
 		System.out.println("demoUserWhois()");
 		Response resp;
 		String username = "baronbeandip";
-		resp = oAuth2.requestUserWhois(username);
+		resp = oAuth2.requestUserWhois("user.profile", username);
 		if (resp.isSuccess()) {
-			System.out.println(username + "'s real name is \'" + ((RespUserWhois)resp).getWhoisResults()[0].getRealName() + "\'.");
+			System.out.println(username + "'s real name is \'" + ((RespUsers)resp).getUsers()[0].getProfile().getRealName() + "\'.");
 		}
 		else {
 			System.out.println(resp);

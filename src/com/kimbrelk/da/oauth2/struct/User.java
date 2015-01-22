@@ -50,13 +50,13 @@ public final class User {
 			mDetails = new Details(json.getJSONObject("details"));
 		}
 		if (json.has("geo")) {
-			mGeo = new Geo(json.getJSONObject("details"));
+			mGeo = new Geo(json.getJSONObject("geo"));
 		}
 		if (json.has("profile")) {
-			mProfile = new Profile(json.getJSONObject("details"));
+			mProfile = new Profile(json.getJSONObject("profile"));
 		}
 		if (json.has("stats")) {
-			mStats = new Stats(json.getJSONObject("details"));
+			mStats = new Stats(json.getJSONObject("stats"));
 		}
 	}
 	

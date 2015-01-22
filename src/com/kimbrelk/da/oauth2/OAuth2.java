@@ -35,6 +35,7 @@ import com.kimbrelk.da.oauth2.response.RespStashPublishUserdata;
 import com.kimbrelk.da.oauth2.response.RespStashSpace;
 import com.kimbrelk.da.oauth2.response.RespStashSubmit;
 import com.kimbrelk.da.oauth2.response.RespToken;
+import com.kimbrelk.da.oauth2.response.RespUser;
 import com.kimbrelk.da.oauth2.response.RespUserDamntoken;
 import com.kimbrelk.da.oauth2.response.RespUserFriends;
 import com.kimbrelk.da.oauth2.response.RespUserFriendsWatching;
@@ -43,17 +44,14 @@ import com.kimbrelk.da.oauth2.response.RespUserStatus;
 import com.kimbrelk.da.oauth2.response.RespUserStatuses;
 import com.kimbrelk.da.oauth2.response.RespUserStatusPost;
 import com.kimbrelk.da.oauth2.response.RespUserWatchers;
-import com.kimbrelk.da.oauth2.response.RespUserWhoami;
-import com.kimbrelk.da.oauth2.response.RespUserWhois;
+import com.kimbrelk.da.oauth2.response.RespUsers;
 import com.kimbrelk.da.oauth2.response.Response;
 import com.kimbrelk.da.oauth2.struct.DisplayResolution;
 import com.kimbrelk.da.oauth2.struct.GalleryMode;
 import com.kimbrelk.da.oauth2.struct.License;
 import com.kimbrelk.da.oauth2.struct.Maturity;
 import com.kimbrelk.da.oauth2.struct.Share;
-import com.kimbrelk.da.oauth2.struct.User;
 import com.kimbrelk.da.oauth2.struct.Watch;
-import com.kimbrelk.da.oauth2.struct.Whois;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -73,13 +71,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import javax.net.ssl.HttpsURLConnection;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 @SuppressWarnings("static-access")
 public final class OAuth2 {
-	private final static Version VERSION = new Version(1, 20141204);
+	private final static Version VERSION = new Version(1, 20150106);
 	private final static Endpoints_v1 ENDPOINTS = new Endpoints_v1();
 	private final static boolean SHOW_MATURE_DEFAULT = true;
 	
@@ -2332,16 +2329,22 @@ public final class OAuth2 {
 		}
 	}
 	public final Response requestUserWhoami() {
+		return requestUserWhoami(null);
+	}
+	public final Response requestUserWhoami(String expansions) {
 		Response respVerify = verifyScopesAndAuth(Scope.USER);
 		if (respVerify.isError()) {
 			return respVerify;
 		}
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("access_token", mToken.getToken());
+		if (expansions != null) {
+			params.put("expand", expansions);
+		}
 		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.USER_WHOAMI, params));
 		try {
 			if (!json.has("error")) {
-				return new RespUserWhoami(new User(json));
+				return new RespUser(json);
 			}
 			else {
 				return new RespError(json);
@@ -2352,7 +2355,7 @@ public final class OAuth2 {
 			return null;
 		}
 	}
-	public final Response requestUserWhois(String... users) {
+	public final Response requestUserWhois(String expansions, String... users) {
 		Response respVerify = verifyScopesAndAuth(Scope.BROWSE);
 		if (respVerify.isError()) {
 			return respVerify;
@@ -2362,6 +2365,9 @@ public final class OAuth2 {
 		}
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("access_token", mToken.getToken());
+		if (expansions != null) {
+			params.put("expand", expansions);
+		}
 		String postData = "";
 		for(int a=0; a<users.length; a++) {
 			postData += "usernames[" + a + "]=" + users[a] + "\n";
@@ -2369,12 +2375,7 @@ public final class OAuth2 {
 		JSONObject json = requestJSON(Verb.POST, createURL(ENDPOINTS.USER_WHOIS, params), postData);
 		try {
 			if (!json.has("error")) {
-				JSONArray jsonResults = json.getJSONArray("results");
-				Whois[] results = new Whois[jsonResults.length()];
-				for(int a=0; a<results.length; a++) {
-					results[a] = new Whois(jsonResults.getJSONObject(a));
-				}
-				return new RespUserWhois(results);
+				return new RespUsers(json);
 			}
 			else {
 				return new RespError(json);
