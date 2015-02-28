@@ -10,7 +10,7 @@ public abstract class RespPagination<T> extends Response {
 	
 	public RespPagination(JSONObject json, String arrayName) throws JSONException {
 		super();
-		mHasMore = json.getBoolean("has_more");
+		mHasMore = json.optBoolean("has_more");
 		getResultsFromJsonArray(json.getJSONArray(arrayName));
 	}
 	

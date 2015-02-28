@@ -10,6 +10,7 @@ import com.kimbrelk.da.oauth2.response.RespComment;
 import com.kimbrelk.da.oauth2.response.RespComments;
 import com.kimbrelk.da.oauth2.response.RespCurated;
 import com.kimbrelk.da.oauth2.response.RespCuratedTags;
+import com.kimbrelk.da.oauth2.response.RespDataCountries;
 import com.kimbrelk.da.oauth2.response.RespDeviation;
 import com.kimbrelk.da.oauth2.response.RespDeviationContent;
 import com.kimbrelk.da.oauth2.response.RespDeviationEmbeddedContent;
@@ -34,6 +35,7 @@ import com.kimbrelk.da.oauth2.response.RespStashPublish;
 import com.kimbrelk.da.oauth2.response.RespStashPublishUserdata;
 import com.kimbrelk.da.oauth2.response.RespStashSpace;
 import com.kimbrelk.da.oauth2.response.RespStashSubmit;
+import com.kimbrelk.da.oauth2.response.RespText;
 import com.kimbrelk.da.oauth2.response.RespToken;
 import com.kimbrelk.da.oauth2.response.RespUser;
 import com.kimbrelk.da.oauth2.response.RespUserDamntoken;
@@ -52,6 +54,7 @@ import com.kimbrelk.da.oauth2.struct.License;
 import com.kimbrelk.da.oauth2.struct.Maturity;
 import com.kimbrelk.da.oauth2.struct.Share;
 import com.kimbrelk.da.oauth2.struct.Watch;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -70,13 +73,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
 import javax.net.ssl.HttpsURLConnection;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 @SuppressWarnings("static-access")
 public final class OAuth2 {
-	private final static Version VERSION = new Version(1, 20150106);
+	private final static Version VERSION = new Version(1, 20150217);
 	private final static Endpoints_v1 ENDPOINTS = new Endpoints_v1();
 	private final static boolean SHOW_MATURE_DEFAULT = true;
 	
@@ -1132,6 +1137,91 @@ public final class OAuth2 {
 		try {
 			if (!json.has("error")) {
 				return new RespCuratedTags(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public final Response requestDataCountries() {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.DATA_COUNTRIES, params));
+		try {
+			if (!json.has("error")) {
+				return new RespDataCountries(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestDataPrivacy() {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.DATA_PRIVACY, params));
+		try {
+			if (!json.has("error")) {
+				return new RespText(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestDataSubmission() {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.DATA_SUBMISSION, params));
+		try {
+			if (!json.has("error")) {
+				return new RespText(json);
+			}
+			else {
+				return new RespError(json);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public final Response requestDataTOS() {
+		Response respVerify = verifyScopesAndAuth(true, Scope.BROWSE);
+		if (respVerify.isError()) {
+			return respVerify;
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("access_token", mToken.getToken());
+		JSONObject json = requestJSON(Verb.GET, createURL(ENDPOINTS.DATA_TOS, params));
+		try {
+			if (!json.has("error")) {
+				return new RespText(json);
 			}
 			else {
 				return new RespError(json);

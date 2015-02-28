@@ -13,6 +13,7 @@ import com.kimbrelk.da.oauth2.response.RespComment;
 import com.kimbrelk.da.oauth2.response.RespComments;
 import com.kimbrelk.da.oauth2.response.RespCurated;
 import com.kimbrelk.da.oauth2.response.RespCuratedTags;
+import com.kimbrelk.da.oauth2.response.RespDataCountries;
 import com.kimbrelk.da.oauth2.response.RespDeviation;
 import com.kimbrelk.da.oauth2.response.RespDeviationContent;
 import com.kimbrelk.da.oauth2.response.RespDeviationEmbeddedContent;
@@ -34,6 +35,7 @@ import com.kimbrelk.da.oauth2.response.RespStashPublish;
 import com.kimbrelk.da.oauth2.response.RespStashPublishUserdata;
 import com.kimbrelk.da.oauth2.response.RespStashSpace;
 import com.kimbrelk.da.oauth2.response.RespStashSubmit;
+import com.kimbrelk.da.oauth2.response.RespText;
 import com.kimbrelk.da.oauth2.response.RespUser;
 import com.kimbrelk.da.oauth2.response.RespUserDamntoken;
 import com.kimbrelk.da.oauth2.response.RespUserFriends;
@@ -54,6 +56,7 @@ import com.kimbrelk.da.oauth2.struct.License;
 import com.kimbrelk.da.oauth2.struct.Maturity;
 import com.kimbrelk.da.oauth2.struct.TimeRange;
 import com.kimbrelk.da.oauth2.struct.Watch;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -64,7 +67,7 @@ import java.util.Scanner;
 @SuppressWarnings("unused")
 public final class Main {
 	private final static ClientCredentials CREDENTIALS = new MyCredentials();
-	private final static AuthGrantType GRANT_TYPE = AuthGrantType.AUTHORIZATION_CODE;
+	private final static AuthGrantType GRANT_TYPE = AuthGrantType.CLIENT_CREDENTIALS;
 	private final static String URI_REDIRECT = "http://127.0.0.1/";
 	
 	public final static void main(String[] args) {
@@ -105,9 +108,9 @@ public final class Main {
 			// Auth Demos
 			demoAuthGetTokens(oAuth2);
 			//demoUtilPlacebo(oAuth2);
-			//demoAuthRevoke(oAuth2);	// /revoke is broken on dA's side at this time.
+			//demoAuthRevoke(oAuth2);
 			//demoUtilPlacebo(oAuth2);
-
+			
 			// Super Demos
 			//demo429(oAuth2);
 			//demoAllComments(oAuth2);
@@ -143,6 +146,12 @@ public final class Main {
 			// Curated Demos
 			//demoCurated(oAuth2);
 			//demoCuratedTags(oAuth2);
+			
+			// Data Demos
+			//demoDataCountries(oAuth2);
+			//demoDataPrivacy(oAuth2);
+			//demoDataSubmission(oAuth2);
+			//demoDataTOS(oAuth2);
 			
 			// Deviation Demos
 			//demoDeviation(oAuth2);
@@ -191,8 +200,8 @@ public final class Main {
 			//demoUserStatusPost(oAuth2);
 			//demoUserStatuses(oAuth2);
 			//demoUserWatchers(oAuth2);
-			demoUserWhoami(oAuth2);
-			demoUserWhois(oAuth2);
+			//demoUserWhoami(oAuth2);
+			//demoUserWhois(oAuth2);
 			
 			// Util Demos
 			//demoUtilPlacebo(oAuth2);
@@ -627,6 +636,55 @@ public final class Main {
 		resp = oAuth2.requestCuratedTags();
 		if (resp.isSuccess()) {
 			System.out.println("The first curated tag is: \"" + ((RespCuratedTags)resp).getResults()[0].getName() + "\".");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	
+	private final static void demoDataCountries(OAuth2 oAuth2) {
+		System.out.println("demoDataCountries()");
+		Response resp = oAuth2.requestDataCountries();
+		if (resp.isSuccess()) {
+			System.out.println("Name and id of 2nd country: \"" + 
+				((RespDataCountries)resp).getResults()[2-1].getName() + "\"");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoDataSubmission(OAuth2 oAuth2) {
+		System.out.println("demoDataSubmission()");
+		Response resp = oAuth2.requestDataSubmission();
+		if (resp.isSuccess()) {
+			System.out.println("Submission Policy: \"" + 
+				((RespText)resp).getText() + "\"");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoDataPrivacy(OAuth2 oAuth2) {
+		System.out.println("demoDataPrivacy()");
+		Response resp = oAuth2.requestDataPrivacy();
+		if (resp.isSuccess()) {
+			System.out.println("Privacy Policy: \"" + 
+				((RespText)resp).getText() + "\"");
+		}
+		else {
+			System.out.println(resp);
+		}
+		System.out.println();
+	}
+	private final static void demoDataTOS(OAuth2 oAuth2) {
+		System.out.println("demoDataTOS()");
+		Response resp = oAuth2.requestDataTOS();
+		if (resp.isSuccess()) {
+			System.out.println("Terms of Service: \"" + 
+				((RespText)resp).getText() + "\"");
 		}
 		else {
 			System.out.println(resp);

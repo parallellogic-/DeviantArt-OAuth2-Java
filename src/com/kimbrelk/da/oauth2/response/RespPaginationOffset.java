@@ -9,6 +9,9 @@ public abstract class RespPaginationOffset<T> extends RespPagination<T> {
 	public RespPaginationOffset(JSONObject json, String resultsName) throws JSONException {
 		super(json, resultsName);
 		mNextOffset = json.optInt("next_offset");
+		if (!hasMore()) {
+			mNextOffset = -1;
+		}
 	}
 	
 	public final int getNextOffset() {

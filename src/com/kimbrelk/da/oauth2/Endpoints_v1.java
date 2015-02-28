@@ -33,6 +33,12 @@ public final class Endpoints_v1 extends Endpoints {
 	
 	public final static String CURATED = 					PREFIX_ENDPOINT + "curated";
 	public final static String CURATED_TAGS = 				CURATED + "/tags";
+
+	public final static String DATA = 						PREFIX_ENDPOINT + "data/";
+	public final static String DATA_COUNTRIES = 			DATA + "countries";
+	public final static String DATA_PRIVACY = 				DATA + "privacy";
+	public final static String DATA_SUBMISSION = 			DATA + "submission";
+	public final static String DATA_TOS = 					DATA + "tos";
 	
 	public final static String DEVIATION = 					PREFIX_ENDPOINT + "deviation/";
 	public final static String DEVIATION_CONTENT = 			DEVIATION + "content";
