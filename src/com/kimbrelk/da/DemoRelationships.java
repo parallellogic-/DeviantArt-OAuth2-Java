@@ -10,7 +10,6 @@ import com.kimbrelk.da.oauth2.response.RespUserWatchers;
 import com.kimbrelk.da.oauth2.response.Response;
 import com.kimbrelk.da.oauth2.struct.Friend;
 import com.kimbrelk.da.oauth2.struct.Watcher;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.PriorityQueue;
@@ -74,7 +73,7 @@ public final class DemoRelationships extends Thread {
 		try {
 			long timeStart = System.currentTimeMillis();
 			HashMap<String, User> map = new HashMap<String, User>();
-			getRelationships("pickley", 1, map);
+			getRelationships("OrrinFox", 2, map);
 			printRelationships(map);
 			long timeEnd = System.currentTimeMillis();
 			System.out.println("Done in " + ((timeEnd - timeStart) / 1000.0) + " seconds.");
@@ -85,17 +84,17 @@ public final class DemoRelationships extends Thread {
 	}
 	
 	private final static void printRelationships(HashMap<String, User> nodes) {
-		//HashMap<String, Boolean> proccessedMap = new HashMap<String, Boolean>();
 		int len = nodes.size();
 		String[] keys = new String[len];
 		nodes.keySet().toArray(keys);
 		System.out.println("graph g {");
+		System.out.println("    node [shape=ellipse];");
+		System.out.println("    node [fontsize=8];");
 		for(int a=0; a<len; a++) {
 			User user = nodes.get(keys[a]);
 			if (user != null) {
 				int len2;
-				/*
-				len2 = user.getWatchList().size();
+				/*len2 = user.getWatchList().size();
 				for(int b=0; b<len2; b++) {
 					String user2 = user.getWatchList().get(b);
 					System.out.println("    \"" + user.getName().replace('-', '_') + "\" -> \"" + user2.replace('-', '_') + "\";");
@@ -104,8 +103,7 @@ public final class DemoRelationships extends Thread {
 				for(int b=0; b<len2; b++) {
 					String user2 = user.getWatchedByList().get(b);
 					System.out.println("    \"" + user2.replace('-', '_') + "\" -> \"" + user.getName().replace('-', '_') + "\";");
-				}
-				*/
+				}*/
 				len2 = user.getWatchedByList().size();
 				for(int b=0; b<len2; b++) {
 					String user2 = user.getWatchedByList().get(b);
@@ -115,9 +113,10 @@ public final class DemoRelationships extends Thread {
 				}
 			}
 		}
+		System.out.println("    size=20;");
+		System.out.println("    ratio=fill;");
 		System.out.println("}");
 	}
-	
 	private final void getRelationships(String userName, int degrees, HashMap<String, User> map) throws Exception {
 		PriorityQueue<QueueItem> queue = new PriorityQueue<QueueItem>();
 		queue.add(new QueueItem(userName, 0));
@@ -125,10 +124,10 @@ public final class DemoRelationships extends Thread {
 			QueueItem item = queue.poll();
 			if (item.degree <= degrees - 1) {
 				if (!map.containsKey(item.name.toLowerCase())) {
-					User user = new User(userName);
+					User user = new User(item.name);
 					int nextOffset = 0;
 					while (nextOffset != -1) {
-						Response resp = mOAuth.requestUserFriends(userName, null, nextOffset, 50);
+						Response resp = mOAuth.requestUserFriends(item.name, null, nextOffset, 50);
 						if (!resp.isError()) {
 							RespUserFriends respWatching = (RespUserFriends)resp;
 							nextOffset = respWatching.getNextOffset();
@@ -152,7 +151,7 @@ public final class DemoRelationships extends Thread {
 					}
 					nextOffset = 0;
 					while (nextOffset != -1) {
-						Response resp = mOAuth.requestUserWatchers(userName, null, nextOffset, 50);
+						Response resp = mOAuth.requestUserWatchers(item.name, null, nextOffset, 50);
 						if (!resp.isError()) {
 							RespUserWatchers respWatchers = (RespUserWatchers)resp;
 							nextOffset = respWatchers.getNextOffset();
@@ -174,13 +173,13 @@ public final class DemoRelationships extends Thread {
 						}
 						sleep(getWaitTime());
 					}
-					map.put(userName.toLowerCase(), user);
+					map.put(item.name.toLowerCase(), user);
 				}
 			}
 		}
 	}
-
-	public final void decreaseWaitTime() {
+	
+	private final void decreaseWaitTime() {
 		mWaitTime /= 2;
 		if (mWaitTime < MIN_WAIT_TIME) {
 			mWaitTime = MIN_WAIT_TIME;
@@ -189,11 +188,11 @@ public final class DemoRelationships extends Thread {
 			//System.out.println("Speeding up... (" + mWaitTime + "ms)");
 		}
 	}
-	public final void increaseWaitTime() {
+	private final void increaseWaitTime() {
 		mWaitTime *= 2;
 		//System.out.println("Slowing down... (" + mWaitTime + "ms)");
 	}
-	public final int getWaitTime() {
+	private final int getWaitTime() {
 		return mWaitTime;
 	}
 	
@@ -247,7 +246,6 @@ public final class DemoRelationships extends Thread {
 			return mWatchedBy;
 		}
 	}
-	
 	private final class QueueItem implements Comparable<QueueItem> {
 		public String name;
 		public int degree;
